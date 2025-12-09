@@ -13,7 +13,7 @@ const OAuth = () => {
         <View className="flex-1 h-[1px] bg-general-100" />
     </View>
 
-    <CustomButton title="Log In with Microsoft Account" 
+    <CustomButton title="Login dengan akun Microsoft" 
     className="mt-5 w-full shadow-none" 
     IconLeft={() => (
         <Image source={icons.microsoft} 
