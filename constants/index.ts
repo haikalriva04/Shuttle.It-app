@@ -45,6 +45,9 @@ import trash from "@/assets/icons/trash.png";
 import upArrowGrey from "@/assets/icons/up-arrow-grey.png";
 import upArrowWhite from "@/assets/icons/up-arrow-white.png";
 import backgroundShuttleit from "@/assets/images/background-shuttleit.png";
+import binusAlamSutera from "@/assets/images/binus-alam-sutera.png";
+import binusKemanggisan from "@/assets/images/binus-kemanggisan-anggrek.png";
+import binusSenayan from "@/assets/images/binus-senayan.png";
 import check from "@/assets/images/check.png";
 import getStarted from "@/assets/images/get-started.png";
 import noResult from "@/assets/images/no-result.png";
@@ -63,7 +66,10 @@ export const images = {
     check,
     noResult,
     backgroundShuttleit,
-    shuttleItLogo
+    shuttleItLogo,
+    binusAlamSutera,
+    binusKemanggisan,
+    binusSenayan,
 };
 
 export const icons = {

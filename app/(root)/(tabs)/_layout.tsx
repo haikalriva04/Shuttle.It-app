@@ -35,7 +35,7 @@ const Layout = () => (
         tabBarStyle: {
           backgroundColor: "#000000",
           overflow: "hidden",
-          height: 80,
+          height: 85,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
