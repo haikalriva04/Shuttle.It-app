@@ -37,9 +37,10 @@ const SignIn = () => {
       }
     } catch (err: any) {
       console.log(JSON.stringify(err, null, 2));
-      Alert.alert("Error", err.errors[0].longMessage);
+      const errorMessage = err.errors?.[0]?.longMessage || err.message || "Log in failed. Please try again.";
+      Alert.alert("Error", errorMessage);
     }
-  }, [isLoaded, form, router, setActive, signIn]);
+  }, [isLoaded, form.email, form.password, router, setActive, signIn]);
 
   return (
     

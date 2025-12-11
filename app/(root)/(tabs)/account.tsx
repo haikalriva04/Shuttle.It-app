@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import background from "../../../assets/images/background-shuttleit.png";
 
-const MyAccount = () => {
+const Account = () => {
   return (
 
     <ImageBackground
@@ -12,10 +12,10 @@ const MyAccount = () => {
         style={{ flex: 1 }}
     >
         <SafeAreaView style={{ flex: 1, paddingHorizontal: 16 }}>
-            <Text>MyAccount</Text>
+            <Text>Account</Text>
         </SafeAreaView>
     </ImageBackground>
   );
 };
 
-export default MyAccount;
+export default Account;

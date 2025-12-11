@@ -40,6 +40,7 @@ import slashEye from "@/assets/icons/slash-eye.png";
 import smallLock from "@/assets/icons/small-lock.png";
 import star from "@/assets/icons/star.png";
 import target from "@/assets/icons/target.png";
+import bookingTicket from "@/assets/icons/ticket.png";
 import trash from "@/assets/icons/trash.png";
 import upArrowGrey from "@/assets/icons/up-arrow-grey.png";
 import upArrowWhite from "@/assets/icons/up-arrow-white.png";
@@ -50,6 +51,7 @@ import noResult from "@/assets/images/no-result.png";
 import onboarding1 from "@/assets/images/onboarding1.png";
 import onboarding2 from "@/assets/images/onboarding2.png";
 import onboarding3 from "@/assets/images/onboarding3.png";
+import shuttleItLogo from "@/assets/images/shuttleit-logo.png";
 import signUpCar from "@/assets/images/signup-car.png";
 
 export const images = {
@@ -61,6 +63,7 @@ export const images = {
     check,
     noResult,
     backgroundShuttleit,
+    shuttleItLogo
 };
 
 export const icons = {
@@ -87,6 +90,7 @@ addFeedback,
   location,
   greyLock,
   map,
+  bookingTicket,
   marker,
   myAccountIcon,
   notification,

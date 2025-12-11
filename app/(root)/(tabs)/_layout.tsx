@@ -20,7 +20,7 @@ const TabIcon = ({
         source={source}
         tintColor="white"
         resizeMode="contain"
-        className="w-7 h-7"
+        className="w-8 h-8"
       />
     </View>
   </View>
@@ -33,12 +33,13 @@ const Layout = () => (
         tabBarInactiveTintColor: "white",
         tabBarShowLabel: true,
         tabBarStyle: {
-          backgroundColor: "#333333",
+          backgroundColor: "#000000",
           overflow: "hidden",
-          height: 61,
+          height: 80,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          flexDirection: "column",
           position: "absolute",
         },
       }}>
@@ -52,20 +53,20 @@ const Layout = () => (
           ),
         }}
     />
-      <Tabs.Screen
-        name="campusinfo"
+       <Tabs.Screen
+        name="recentbookings"
         options={{
-          title: "Campus Info",
+          title: "Recent Bookings",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <TabIcon source={icons.Info} focused={focused} />
+            <TabIcon source={icons.bookingTicket} focused={focused} />
           ),
         }}
     />
       <Tabs.Screen
-        name="myaccount"
+        name="account"
         options={{
-          title: "My Account",
+          title: "Account",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
             <TabIcon source={icons.myAccountIcon} focused={focused} />

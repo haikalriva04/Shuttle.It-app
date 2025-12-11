@@ -4,17 +4,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import background from "../../../assets/images/background-shuttleit.png";
 
-const CampusInfo = () => {
+const RecentBookings = () => {
   return (
     <ImageBackground
         source={background}
         style={{ flex: 1 }}
     >
         <SafeAreaView style={{ flex: 1, paddingHorizontal: 16 }}>
-            <Text>CampusInfo</Text>
+            <Text>Recent Bookings</Text>
         </SafeAreaView>
     </ImageBackground>
   );
 };
 
-export default CampusInfo;
+export default RecentBookings;

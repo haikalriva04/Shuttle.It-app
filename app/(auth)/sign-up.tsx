@@ -2,6 +2,7 @@ import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
 import OAuth from "@/components/OAuth";
 import { icons, images } from "@/constants";
+import { fetchAPI } from "@/lib/fetch";
 
 import { useSignUp } from "@clerk/clerk-expo";
 import { Link, router } from "expo-router";
@@ -56,7 +57,15 @@ const SignUp = () => {
       });
 
       if (completeSignUp.status === "complete") {
-        // TODO Create a Database user!
+        await fetchAPI('/(api)/user', { 
+          method: "POST", 
+          body: JSON.stringify({
+            name: form.name, 
+            email: form.email,
+            clerkId: completeSignUp.createdUserId,
+          }),
+        } 
+);
 
         await setActive({ session: completeSignUp.createdSessionId });
         setVerification({ ...verification, state: "success" });
@@ -64,7 +73,8 @@ const SignUp = () => {
         setVerification({ ...verification, error: "Verification failed. Please try again.", state: "failed", });
       }
     } catch (err: any) {
-      setVerification({ ...verification, error: err.errors[0].longMessage, state: "failed", });
+      const errorMessage = err.errors?.[0]?.longMessage || err.message || "An unknown error occurred";
+      setVerification({ ...verification, error: errorMessage, state: "failed", });
     }
   };
 
