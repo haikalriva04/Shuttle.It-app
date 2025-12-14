@@ -23,7 +23,7 @@ const recentBookings = [
         "user_id": "1",
         "created_at": "2024-08-12 05:19:20.620007",
         "driver": {
-            "driver_id": "2",
+            "driver_id": "1",
             "first_name": "Joko",
             "last_name": "Priyono",
             "profile_image_url": "https://ucarecdn.com/6ea6d83d-ef1a-483f-9106-837a3a5b3f67/-/preview/1000x666/",
@@ -44,7 +44,7 @@ const recentBookings = [
         "user_id": "1",
         "created_at": "2024-08-12 06:12:17.683046",
         "driver": {
-            "driver_id": "1",
+            "driver_id": "2",
             "first_name": "Budi",
             "last_name": "Santoso",
             "profile_image_url": "https://ucarecdn.com/dae59f69-2c1f-48c3-a883-017bcf0f9950/-/preview/1000x666/",
@@ -66,7 +66,7 @@ const recentBookings = [
         "user_id": "1",
         "created_at": "2024-08-12 08:49:01.809053",
         "driver": {
-            "driver_id": "1",
+            "driver_id": "3",
             "first_name": "Gatot",
             "last_name": "Rusdiansyah",
             "profile_image_url": "https://ucarecdn.com/dae59f69-2c1f-48c3-a883-017bcf0f9950/-/preview/1000x666/",
@@ -88,7 +88,7 @@ const recentBookings = [
         "user_id": "1",
         "created_at": "2024-08-12 18:43:54.297838",
         "driver": {
-            "driver_id": "3",
+            "driver_id": "4",
             "first_name": "Muhammad",
             "last_name": "Sumbul",
             "profile_image_url": "https://ucarecdn.com/0330d85c-232e-4c30-bd04-e5e4d0e3d688/-/preview/826x822/",
@@ -113,7 +113,7 @@ export default function Page() {
         const requestLocation = async () => {
           let { status } = await Location.requestForegroundPermissionsAsync();
 
-          if(status != 'granted') {
+          if(status !== 'granted') {
             setHasPermissions(false)
             return;
           }
@@ -142,7 +142,7 @@ export default function Page() {
         <ImageBackground source={images.backgroundShuttleit} resizeMode="cover" className="flex-1" >
         <SafeAreaView className="bg-transparent" edges={['left', 'right', 'bottom']}>
           <FlatList 
-          data={recentBookings?.slice(0, 5)} 
+          data={recentBookings?.slice(0, 2)} 
           renderItem={({ item }) => <BookingCard ride={item} />} 
           className="px-5" 
           keyboardShouldPersistTaps="handled" 
