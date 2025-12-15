@@ -1,13 +1,14 @@
 import BookingCard from "@/components/BookingCard";
+import GoogleTextInput from "@/components/GoogleTextInput";
 import Map from "@/components/Map";
 import { icons, images } from "@/constants";
 import { useLocationStore } from "@/store";
 import { useUser } from "@clerk/clerk-expo";
 import * as Location from 'expo-location';
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Image, ImageBackground, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 
 const recentBookings = [
     {
@@ -107,7 +108,16 @@ export default function Page() {
     const [hasPermissions, setHasPermissions] = useState(false);
 
     const handleSignOut = () => {};
-    const handleDestinationPress = () => {};
+    const handleDestinationPress = (location: { 
+        latitude: number; 
+        longitude: number; 
+        address: string; 
+    }) => {
+            setDestinationLocation(location);
+
+            router.push("/(root)/book-bus");
+        };
+
 
     useEffect(() => {
         const requestLocation = async () => {
@@ -181,9 +191,15 @@ export default function Page() {
                 <Text className="text-md font-PoppinsMedium text-white">Mau ke kampus mana hari ini ?</Text>
             </View>
 
+               <GoogleTextInput 
+            icon={icons.search} 
+            containerStyle="bg-white shadow-md shadow-neutral-300"
+            handlePress={handleDestinationPress}
+            />
+
             <>
             <Text className="text-md font-PoppinsBold text-white mt-5 mb-2">Lokasi Live Map</Text>
-            <View className="flex flex-row items-center bg-transparent h-[500px]">
+            <View className="flex flex-row items-center bg-transparent h-[450px]">
             <Map />
             </View>
         </>
