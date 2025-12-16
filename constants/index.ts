@@ -5,6 +5,8 @@ import backArrowDark from "@/assets/icons/back-arrow-dark.png";
 import backArrowLight from "@/assets/icons/back-arrow-light.png";
 import bigLock from "@/assets/icons/big-lock.png";
 import Info from "@/assets/icons/campus-info.png";
+import changeProfile from "@/assets/icons/change-profile.png";
+import chat from "@/assets/icons/chat.png";
 import checkFeedback from "@/assets/icons/check-feedback.png";
 import close from "@/assets/icons/close.png";
 import destination from "@/assets/icons/destination-pin.png";
@@ -30,12 +32,14 @@ import person from "@/assets/icons/person.png";
 import pickupPin from "@/assets/icons/pickup-pin.png";
 import pin from "@/assets/icons/pin.png";
 import point from "@/assets/icons/point.png";
+import privacyPolicy from "@/assets/icons/privacy-policy.png";
 import profile from "@/assets/icons/profile.png";
 import rightArrow from "@/assets/icons/right-arrow.png";
 import schedule from "@/assets/icons/schedule.png";
 import search from "@/assets/icons/search.png";
 import seeFeedbackEye from "@/assets/icons/see-feedback-eye.png";
 import selectedMarker from "@/assets/icons/selected-marker.png";
+import sendFeedback from "@/assets/icons/send-feedback.png";
 import slashEye from "@/assets/icons/slash-eye.png";
 import smallLock from "@/assets/icons/small-lock.png";
 import star from "@/assets/icons/star.png";
@@ -74,6 +78,10 @@ export const images = {
 
 export const icons = {
 addFeedback,
+sendFeedback, 
+changeProfile, 
+chat, 
+privacyPolicy,
   arrowDown,
   arrowUp,
   backArrowLight,
