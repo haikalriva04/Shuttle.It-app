@@ -40,8 +40,6 @@ const Account = () => {
   };
 
   const handleWhatsApp = () => {
-    // WhatsApp format: https://wa.me/<number>?text=<encoded_message>
-    // Number format must remove '+' and dashes.
     const url = "https://wa.me/6287801724687?text=Live%20Agent";
     handleOpenLink(url);
   };
@@ -74,7 +72,7 @@ const Account = () => {
         setUploading(true);
         const imageAsset = result.assets[0];
 
-        // Clerk requires the format: "data:image/jpeg;base64,..."
+        
         const base64Image = `data:${imageAsset.mimeType};base64,${imageAsset.base64}`;
 
         
@@ -136,7 +134,7 @@ const Account = () => {
           showsVerticalScrollIndicator={false}
           className="px-5"
         >
-          {/* 1. Header: Profile Picture & Edit Button */}
+          
           <View className="items-center mt-10 mb-8">
             <View className="relative">
               <Image
@@ -150,7 +148,7 @@ const Account = () => {
                 onPress={handleImageUpload}
                 disabled={uploading} 
               >
-                {/* [MODIFIED] Show loading spinner or icon */}
+                
                 {uploading ? (
                   <ActivityIndicator size="small" color="#ffffff" />
                 ) : (
@@ -168,13 +166,13 @@ const Account = () => {
             </Text>
           </View>
 
-          {/* 2. Account Information Section */}
+          
           <View className="bg-black/50 rounded-3xl p-5 mb-6">
             <Text className="text-lg font-PoppinsBold mb-4 text-white">
               Account Info
             </Text>
 
-            {/* Username Field */}
+            
             <View className="mb-4">
               <Text className="text-xs font-PoppinsMedium text-white mb-1 ml-1">
                 Username
@@ -187,7 +185,7 @@ const Account = () => {
               </View>
             </View>
 
-            {/* Email Field */}
+            
             <View className="mb-4">
               <Text className="text-xs font-PoppinsMedium text-white mb-1 ml-1">
                 Email
@@ -199,7 +197,7 @@ const Account = () => {
               </View>
             </View>
 
-            {/* Password Field (Masked) */}
+            
             <View>
               <Text className="text-xs font-PoppinsMedium text-white mb-1 ml-1">
                 Password
@@ -212,7 +210,7 @@ const Account = () => {
             </View>
           </View>
 
-          {/* 3. Action Buttons Section */}
+          
           <View>
             <MenuButton
               title="Privacy Policy"

@@ -1,4 +1,4 @@
-import BookingCard from "@/components/BookingCard";
+import CampusScheduleButton from "@/components/CampusScheduleButton";
 import GoogleTextInput from "@/components/GoogleTextInput";
 import Map from "@/components/Map";
 import { icons, images } from "@/constants";
@@ -7,13 +7,12 @@ import { useClerk, useUser } from "@clerk/clerk-expo";
 import * as Location from 'expo-location';
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Image, ImageBackground, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Image, ImageBackground, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// [UPDATED] Added Bandung locations to the array
 const binusLocations = [
     {
-        description: "BINUS @ Alam Sutera",
+        description: "BINUS @ Alam Sutera Campus",
         geometry: { location: { lat: -6.223078756118827, lng: 106.64897587120757 } },
     },
     {
@@ -34,94 +33,27 @@ const binusLocations = [
     },
 ];
 
-const recentBookings = [
+const campusSchedules = [
     {
-        "ride_id": "1",
-        "origin_address": "BINUS University @Alam Sutera",
-        "destination_address": "BINUS University @Anggrek",
-        "origin_latitude": "-6.223078756118827",
-        "origin_longitude": "106.64897587120757",
-        "destination_latitude": "-6.201572320039744",
-        "destination_longitude": "106.78222123830047",
-        "ride_time": 391,
-        "driver_id": 2,
-        "user_id": "1",
-        "created_at": "2024-08-12 05:19:20.620007",
-        "driver": {
-            "driver_id": "1",
-            "first_name": "Joko",
-            "last_name": "Priyono",
-            "profile_image_url": "https://ucarecdn.com/6ea6d83d-ef1a-483f-9106-837a3a5b3f67/-/preview/1000x666/",
-            "car_seats": 30,
-            "rating": "4.60"
-        }
+        title: "Binus @ Alam Sutera",
+        image: images.binusAlamSutera,
     },
     {
-        "ride_id": "2",
-        "origin_address": "BINUS University @Anggrek",
-        "destination_address": "BINUS University @Alam Sutera",
-        "origin_latitude": "-6.201572320039744",
-        "origin_longitude": "106.78222123830047",
-        "destination_latitude": "-6.223078756118827",
-        "destination_longitude": "106.64897587120757",
-        "ride_time": 491,
-        "driver_id": 1,
-        "user_id": "1",
-        "created_at": "2024-08-12 06:12:17.683046",
-        "driver": {
-            "driver_id": "2",
-            "first_name": "Budi",
-            "last_name": "Santoso",
-            "profile_image_url": "https://ucarecdn.com/dae59f69-2c1f-48c3-a883-017bcf0f9950/-/preview/1000x666/",
-            "car_image_url": "https://ucarecdn.com/a2dc52b2-8bf7-4e49-9a36-3ffb5229ed02/-/preview/465x466/",
-            "car_seats": 30,
-            "rating": "4.80"
-        }
+        title: "Binus @ Kemanggisan Anggrek",
+        image: images.binusKemanggisan,
     },
     {
-        "ride_id": "3",
-        "origin_address": "BINUS University @Anggrek",
-        "destination_address": "BINUS University @Senayan",
-        "origin_latitude": "-6.201572320039744",
-        "origin_longitude": "106.78222123830047",
-        "destination_latitude": "-6.228945820174364",
-        "destination_longitude": "106.79674458002944",
-        "ride_time": 124,
-        "driver_id": 1,
-        "user_id": "1",
-        "created_at": "2024-08-12 08:49:01.809053",
-        "driver": {
-            "driver_id": "3",
-            "first_name": "Gatot",
-            "last_name": "Rusdiansyah",
-            "profile_image_url": "https://ucarecdn.com/dae59f69-2c1f-48c3-a883-017bcf0f9950/-/preview/1000x666/",
-            "car_image_url": "https://ucarecdn.com/a2dc52b2-8bf7-4e49-9a36-3ffb5229ed02/-/preview/465x466/",
-            "car_seats": 30,
-            "rating": "4.80"
-        }
+        title: "Binus @ Senayan",
+        image: images.binusSenayan,
     },
     {
-        "ride_id": "4",
-        "origin_address": "Binus @Alam Sutera",
-        "destination_address": "Binus @Senayan",
-        "origin_latitude": "-6.223078756118827",
-        "origin_longitude": "106.64897587120757",
-        "destination_latitude": "-6.228945820174364",
-        "destination_longitude": "106.79674458002944",
-        "ride_time": 159,
-        "driver_id": 3,
-        "user_id": "1",
-        "created_at": "2024-08-12 18:43:54.297838",
-        "driver": {
-            "driver_id": "4",
-            "first_name": "Muhammad",
-            "last_name": "Sumbul",
-            "profile_image_url": "https://ucarecdn.com/0330d85c-232e-4c30-bd04-e5e4d0e3d688/-/preview/826x822/",
-            "car_image_url": "https://ucarecdn.com/289764fb-55b6-4427-b1d1-f655987b4a14/-/preview/930x932/",
-            "car_seats": 30,
-            "rating": "4.70"
-        }
-    }
+        title: "Binus @ Bandung Paskal",
+        image: images.binusPaskal,
+    },
+    {
+        title: "Binus @ Bandung Dago",
+        image: images.binusDago,
+    },
 ];
 
 export default function Page() {
@@ -179,25 +111,13 @@ export default function Page() {
         <ImageBackground source={images.backgroundShuttleit} resizeMode="cover" className="flex-1" >
             <SafeAreaView className="bg-transparent" edges={['left', 'right', 'bottom']}>
                 <FlatList 
-                    data={recentBookings?.slice(0, 2)} 
-                    renderItem={({ item }) => <BookingCard ride={item} />} 
+                    data={[]} 
+                    renderItem={null}
                     className="px-5" 
                     keyboardShouldPersistTaps="handled" 
                     contentContainerStyle={{
-                        paddingBottom:80,
+                        paddingBottom: 95,
                     }} 
-                    ListEmptyComponent={() => (
-                        <View className="flex flex-col items-center justify-center">
-                            {!loading ? (
-                                <>
-                                    <Image source={images.noResult} className="w-40 h-40" alt="Tidak ada booking perjalanan ditemukan" resizeMode="contain" />
-                                    <Text className="text-sm font-PoppinsMedium">Tidak ada booking perjalanan ditemukan</Text>
-                                </>
-                            ): (
-                                <ActivityIndicator size="small" color="#FFFFFF" />
-                            ) }
-                        </View>
-                    )} 
                     ListHeaderComponent={() => (
                         <>
                             <View className="flex flex-row items-center justify-between pt-1">
@@ -226,13 +146,32 @@ export default function Page() {
                             />
 
                             <>
-                                <Text className="text-md font-PoppinsBold text-white mt-5 mb-2">Lokasi Live Map</Text>
+                                <Text className="text-lg font-PoppinsBold text-white mt-5 mb-2">Lokasi Live Map</Text>
                                 <View className="flex flex-row items-center bg-transparent h-[450px]">
                                     <Map />
                                 </View>
                             </>
 
-                            <Text className="text-xl font-PoppinsBold text-white my-5">Booking History</Text>
+                            {/* REPLACED BookingCard List with Campus Schedule Buttons */}
+                            <View className="mt-5">
+                                <Text className="text-lg font-PoppinsBold text-white mb-3">Jadwal Bus Setiap Kampus</Text>
+                                <FlatList
+                                    data={campusSchedules}
+                                    horizontal
+                                    showsHorizontalScrollIndicator={false}
+                                    keyExtractor={(item) => item.title}
+                                    renderItem={({ item }) => (
+                                        <CampusScheduleButton 
+                                            title={item.title} 
+                                            image={item.image} 
+                                            onPress={() => {
+                                                // Handle navigation or action here
+                                                console.log(`Selected: ${item.title}`);
+                                            }}
+                                        />
+                                    )}
+                                />
+                            </View>
                         </>
                     )}
                 />

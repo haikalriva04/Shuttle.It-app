@@ -41,11 +41,11 @@ const BookBus = () => {
             return;
         }
 
-        // Navigate to confirm-book page with params
+        
         router.push({
             pathname: "/(root)/confirm-book",
             params: { 
-                date: date.toISOString() // Pass date as string
+                date: date.toISOString() 
             }
         });
     };

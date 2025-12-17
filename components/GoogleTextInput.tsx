@@ -26,15 +26,13 @@ const GoogleTextInput = ({
         placeholder="Cari destinasi kampus tujuan"
         debounce={200}
         
-        // [UPDATED] Pass predefined places
+        
         predefinedPlaces={initialPlaces}
         
-        // [IMPORTANT] Explicitly control list visibility
-        // If not focused: false (Hidden)
-        // If focused: true (Shown)
+        
         listViewDisplayed={isFocused}
 
-        // [IMPORTANT] Ensure predefined places are included in the 'Shown' state
+        
         predefinedPlacesAlwaysVisible={true}
         
         styles={{
@@ -84,7 +82,7 @@ const GoogleTextInput = ({
             />
           </View>
         )}
-        // [UPDATED] Manage focus state
+        
         textInputProps={{
           onFocus: () => setIsFocused(true),
           onBlur: () => setIsFocused(false),

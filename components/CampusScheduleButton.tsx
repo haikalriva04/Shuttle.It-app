@@ -18,10 +18,10 @@ const CampusScheduleButton = ({ title, image, onPress }: CampusScheduleButtonPro
                 resizeMode="cover" 
                 className="flex-1 justify-end"
             >
-                {/* Transparent Black Overlay */}
+               
                 <View className="w-full h-full absolute bg-black/40" />
                 
-                {/* Text Content */}
+                
                 <View className="p-2 items-center justify-center flex-1">
                     <Text className="text-white font-PoppinsBold text-center text-xs">
                         {title}
