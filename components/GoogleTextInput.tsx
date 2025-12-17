@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Image, View } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
@@ -12,7 +13,10 @@ const GoogleTextInput = ({
   containerStyle,
   textInputBackgroundColor,
   handlePress,
+  initialPlaces,
 }: GoogleInputProps) => {
+  const [isFocused, setIsFocused] = useState(false);
+
   return (
     <View
       className={`flex flex-row items-center justify-center relative z-50 rounded-xl ${containerStyle} my-6`}
@@ -21,6 +25,18 @@ const GoogleTextInput = ({
         fetchDetails={true}
         placeholder="Cari destinasi kampus tujuan"
         debounce={200}
+        
+        // [UPDATED] Pass predefined places
+        predefinedPlaces={initialPlaces}
+        
+        // [IMPORTANT] Explicitly control list visibility
+        // If not focused: false (Hidden)
+        // If focused: true (Shown)
+        listViewDisplayed={isFocused}
+
+        // [IMPORTANT] Ensure predefined places are included in the 'Shown' state
+        predefinedPlacesAlwaysVisible={true}
+        
         styles={{
           textInputContainer: {
             alignItems: "center",
@@ -68,7 +84,10 @@ const GoogleTextInput = ({
             />
           </View>
         )}
+        // [UPDATED] Manage focus state
         textInputProps={{
+          onFocus: () => setIsFocused(true),
+          onBlur: () => setIsFocused(false),
           placeholderTextColor: "gray",
           placeholder: initialLocation ?? "Cari destinasi kampus tujuan",
         }}

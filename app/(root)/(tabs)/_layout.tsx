@@ -53,7 +53,8 @@ const Layout = () => (
           ),
         }}
     />
-       <Tabs.Screen
+
+    <Tabs.Screen
         name="recentbookings"
         options={{
           title: "Recent Bookings",

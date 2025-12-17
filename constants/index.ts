@@ -50,7 +50,9 @@ import upArrowGrey from "@/assets/icons/up-arrow-grey.png";
 import upArrowWhite from "@/assets/icons/up-arrow-white.png";
 import backgroundShuttleit from "@/assets/images/background-shuttleit.png";
 import binusAlamSutera from "@/assets/images/binus-alam-sutera.png";
+import binusDago from "@/assets/images/binus-dago.png";
 import binusKemanggisan from "@/assets/images/binus-kemanggisan-anggrek.png";
+import binusPaskal from "@/assets/images/binus-paskal.png";
 import binusSenayan from "@/assets/images/binus-senayan.png";
 import check from "@/assets/images/check.png";
 import getStarted from "@/assets/images/get-started.png";
@@ -60,6 +62,7 @@ import onboarding2 from "@/assets/images/onboarding2.png";
 import onboarding3 from "@/assets/images/onboarding3.png";
 import shuttleItLogo from "@/assets/images/shuttleit-logo.png";
 import signUpCar from "@/assets/images/signup-car.png";
+
 
 export const images = {
     onboarding1,
@@ -74,6 +77,8 @@ export const images = {
     binusAlamSutera,
     binusKemanggisan,
     binusSenayan,
+    binusDago, 
+    binusPaskal,
 };
 
 export const icons = {

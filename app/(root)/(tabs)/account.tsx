@@ -1,8 +1,12 @@
 import { icons, images } from "@/constants";
 import { useClerk, useUser } from "@clerk/clerk-expo";
+import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
+import { useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   Image,
   ImageBackground,
   ScrollView,
@@ -15,6 +19,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const Account = () => {
   const { user } = useUser();
   const { signOut } = useClerk();
+  const [uploading, setUploading] = useState(false); 
 
   const handleLogout = async () => {
     try {
@@ -41,7 +46,56 @@ const Account = () => {
     handleOpenLink(url);
   };
 
-  // Reusable component for the menu buttons
+  
+  const handleImageUpload = async () => {
+    try {
+      
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (permissionResult.granted === false) {
+        Alert.alert(
+          "Permission Required",
+          "You need to allow access to your photos to update your profile picture."
+        );
+        return;
+      }
+
+      
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.5,
+        base64: true, 
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        setUploading(true);
+        const imageAsset = result.assets[0];
+
+        // Clerk requires the format: "data:image/jpeg;base64,..."
+        const base64Image = `data:${imageAsset.mimeType};base64,${imageAsset.base64}`;
+
+        
+        await user?.setProfileImage({
+          file: base64Image,
+        });
+
+        Alert.alert("Success", "Profile picture updated successfully!");
+      }
+    } catch (error: any) {
+      console.error("Upload failed:", error);
+      Alert.alert(
+        "Error",
+        error.errors ? error.errors[0].message : "Failed to update profile image."
+      );
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  
   const MenuButton = ({
     title,
     icon,
@@ -59,9 +113,7 @@ const Account = () => {
         <View className="w-10 h-10 bg-transparent rounded-full items-center justify-center">
           <Image source={icon} className="w-6 h-6" resizeMode="contain" />
         </View>
-        <Text className="text-base font-PoppinsLight text-white">
-          {title}
-        </Text>
+        <Text className="text-base font-PoppinsLight text-white">{title}</Text>
       </View>
       <Image
         source={icons.rightArrow}
@@ -91,23 +143,28 @@ const Account = () => {
                 source={{
                   uri: user?.imageUrl || "https://placehold.co/150",
                 }}
-                className="w-28 h-28 rounded-full border-4 border-white shadow-sm"
+                className="w-28 h-28 rounded-full shadow-sm"
               />
               <TouchableOpacity
-                className="absolute bottom-0 right-0 w-8 h-8 bg-gray-400 rounded-full items-center justify-center border-2 border-white"
-                onPress={() => {
-                  /* Handle Image Upload Logic Later */
-                }}
+                className="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full items-center justify-center"
+                onPress={handleImageUpload}
+                disabled={uploading} 
               >
-                <Image
-                  source={icons.changeProfile}
-                  className="w-8 h-8"
-                  resizeMode="contain"
-                />
+                {/* [MODIFIED] Show loading spinner or icon */}
+                {uploading ? (
+                  <ActivityIndicator size="small" color="#ffffff" />
+                ) : (
+                  <Image
+                    source={icons.changeProfile}
+                    className="w-6 h-6"
+                    resizeMode="contain"
+                  />
+                )}
               </TouchableOpacity>
             </View>
             <Text className="text-2xl font-PoppinsBold text-white mt-4">
-              {user?.firstName || user?.emailAddresses[0].emailAddress.split("@")[0]}
+              {user?.firstName ||
+                user?.emailAddresses[0].emailAddress.split("@")[0]}
             </Text>
           </View>
 

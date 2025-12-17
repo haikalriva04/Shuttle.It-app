@@ -31,7 +31,7 @@ const BookLayout = ({ title, children }: { title: string;
                         </View>
                         <Map />
                     </View>
-                    <BottomSheet keyboardBehavior="extend" ref={bottomSheetRef} snapPoints={["40%", "85%"]} 
+                    <BottomSheet keyboardBehavior="extend" ref={bottomSheetRef} snapPoints={["10%", "85%"]} 
                     index={0}>
                         <BottomSheetScrollView style={{flex: 1, padding: 20}}>
                             {children}

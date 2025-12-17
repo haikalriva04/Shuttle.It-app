@@ -74,6 +74,11 @@ declare interface GoogleInputProps {
         longitude: number;
         address: string;
     }) => void;
+    // [ADDED] Optional prop for predefined places
+    initialPlaces?: {
+        description: string;
+        geometry: { location: { lat: number; lng: number } };
+    }[];
 }
 
 declare interface InputFieldProps extends TextInputProps {
