@@ -57,6 +57,8 @@ import binusPaskal from "@/assets/images/binus-paskal.png";
 import binusSenayan from "@/assets/images/binus-senayan.png";
 import check from "@/assets/images/check.png";
 import getStarted from "@/assets/images/get-started.png";
+import jadwalAnggrek from "@/assets/images/jadwal-bus-anggrek.png";
+import jadwalBekasi from "@/assets/images/jadwal-bus-bekasi.png";
 import noResult from "@/assets/images/no-result.png";
 import onboarding1 from "@/assets/images/onboarding1.png";
 import onboarding2 from "@/assets/images/onboarding2.png";
@@ -80,7 +82,9 @@ export const images = {
     binusSenayan,
     binusDago, 
     binusPaskal,
-    binusBekasi,
+    binusBekasi, 
+    jadwalAnggrek, 
+    jadwalBekasi,
 };
 
 export const icons = {
