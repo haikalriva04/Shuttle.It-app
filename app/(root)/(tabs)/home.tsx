@@ -37,22 +37,27 @@ const campusSchedules = [
     {
         title: "Binus @ Alam Sutera",
         image: images.binusAlamSutera,
+        route: "/(root)/jadwal-alsut"
     },
     {
         title: "Binus @ Kemanggisan Anggrek",
         image: images.binusKemanggisan,
+        route: "/(root)/jadwal-anggrek"
     },
     {
         title: "Binus @ Bekasi",
         image: images.binusBekasi,
+        route: "/(root)/jadwal-bekasi"
     },
     {
         title: "Binus @ Bandung Paskal",
         image: images.binusPaskal,
+        route: "/(root)/jadwal-paskal" // Assuming this page exists or will be made
     },
     {
         title: "Binus @ Bandung Dago",
         image: images.binusDago,
+        route: "/(root)/jadwal-dago" // Assuming this page exists or will be made
     },
 ];
 
@@ -152,7 +157,6 @@ export default function Page() {
                                 </View>
                             </>
 
-                            {/* REPLACED BookingCard List with Campus Schedule Buttons */}
                             <View className="mt-5">
                                 <Text className="text-lg font-PoppinsBold text-white mb-3">Jadwal Bus Setiap Kampus</Text>
                                 <FlatList
@@ -165,8 +169,9 @@ export default function Page() {
                                             title={item.title} 
                                             image={item.image} 
                                             onPress={() => {
-                                                // Handle navigation or action here
-                                                console.log(`Selected: ${item.title}`);
+                                                if (item.route) {
+                                                    router.push(item.route as any);
+                                                }
                                             }}
                                         />
                                     )}
