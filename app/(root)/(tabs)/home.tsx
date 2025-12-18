@@ -20,8 +20,8 @@ const binusLocations = [
         geometry: { location: { lat: -6.201572320039744, lng: 106.78222123830047 } },
     },
     {
-        description: "BINUS International JWC Campus",
-        geometry: { location: { lat: -6.228945820174364, lng: 106.79674458002944 } },
+        description: "BINUS @ Bekasi",
+        geometry: { location: { lat: -6.21946951140796, lng: 106.99979693819046 } },
     },
     {
         description: "Binus @ Bandung Paskal Campus",
@@ -43,8 +43,8 @@ const campusSchedules = [
         image: images.binusKemanggisan,
     },
     {
-        title: "Binus @ Senayan",
-        image: images.binusSenayan,
+        title: "Binus @ Bekasi",
+        image: images.binusBekasi,
     },
     {
         title: "Binus @ Bandung Paskal",

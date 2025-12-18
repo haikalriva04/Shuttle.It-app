@@ -50,6 +50,7 @@ import upArrowGrey from "@/assets/icons/up-arrow-grey.png";
 import upArrowWhite from "@/assets/icons/up-arrow-white.png";
 import backgroundShuttleit from "@/assets/images/background-shuttleit.png";
 import binusAlamSutera from "@/assets/images/binus-alam-sutera.png";
+import binusBekasi from "@/assets/images/binus-bekasi.png";
 import binusDago from "@/assets/images/binus-dago.png";
 import binusKemanggisan from "@/assets/images/binus-kemanggisan-anggrek.png";
 import binusPaskal from "@/assets/images/binus-paskal.png";
@@ -79,6 +80,7 @@ export const images = {
     binusSenayan,
     binusDago, 
     binusPaskal,
+    binusBekasi,
 };
 
 export const icons = {
