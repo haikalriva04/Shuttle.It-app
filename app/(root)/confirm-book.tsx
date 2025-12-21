@@ -41,7 +41,7 @@ const ConfirmBook = () => {
     ];
 
     const handleConfirm = () => {
-        // Add your booking logic here
+        
         router.push("/(root)/(tabs)/home"); 
     };
 

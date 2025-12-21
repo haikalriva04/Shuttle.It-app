@@ -8,6 +8,7 @@ import Info from "@/assets/icons/campus-info.png";
 import changeProfile from "@/assets/icons/change-profile.png";
 import chat from "@/assets/icons/chat.png";
 import checkFeedback from "@/assets/icons/check-feedback.png";
+import clock from "@/assets/icons/clock.png";
 import close from "@/assets/icons/close.png";
 import destination from "@/assets/icons/destination-pin.png";
 import downArrowGrey from "@/assets/icons/down-arrow-grey.png";
@@ -66,7 +67,6 @@ import onboarding3 from "@/assets/images/onboarding3.png";
 import shuttleItLogo from "@/assets/images/shuttleit-logo.png";
 import signUpCar from "@/assets/images/signup-car.png";
 
-
 export const images = {
     onboarding1,
     onboarding2,
@@ -88,6 +88,7 @@ export const images = {
 };
 
 export const icons = {
+clock,
 addFeedback,
 sendFeedback, 
 changeProfile, 
