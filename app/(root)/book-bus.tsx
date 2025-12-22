@@ -29,7 +29,6 @@ const LOCATION_LABELS: Record<string, string> = {
     "BINUS @ Bekasi": "Bekasi",
 };
 
-// Interface untuk data jadwal dari API
 interface ScheduleItem {
     time: string;
     seats_available: number;
@@ -44,11 +43,9 @@ const BookBus = () => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimeModal, setShowTimeModal] = useState(false);
 
-    // State baru untuk data API
     const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Filter Lokasi Asal
     const validOrigins = useMemo(() => {
         if (!destinationAddress) return BINUS_LOCATIONS;
         if (destinationAddress.includes("Alam Sutera")) {
@@ -63,17 +60,15 @@ const BookBus = () => {
         return BINUS_LOCATIONS;
     }, [destinationAddress]);
 
-    // Fetch API setiap kali parameter berubah (Asal, Tujuan, Tanggal)
     useEffect(() => {
         const fetchSchedules = async () => {
             if (!userAddress || !destinationAddress) return;
             
             setIsLoading(true);
-            setSchedules([]); // Reset jadwal saat loading
-            setSelectedTime(null); // Reset pilihan jam
+            setSchedules([]); 
+            setSelectedTime(null); 
 
             try {
-                // Format YYYY-MM-DD
                 const dateStr = date.toISOString().split('T')[0];
                 
                 const response = await fetch(
@@ -100,6 +95,7 @@ const BookBus = () => {
         if (Platform.OS === 'android') setShowDatePicker(false);
         if (event.type === 'set' && selectedDate) {
             setDate(selectedDate);
+            setSelectedTime(null);
         }
     };
 
@@ -113,14 +109,14 @@ const BookBus = () => {
             return;
         }
 
+        // PERBAIKAN DI SINI: Mengirim data origin & destination
         router.push({
             pathname: "/(root)/confirm-book",
             params: { 
                 date: date.toISOString(),
                 timeSlot: selectedTime, 
-                // Kirim juga parameter ini untuk mempermudah di halaman confirm
-                origin: userAddress,
-                destination: destinationAddress
+                origin: userAddress,          // Kirim Lokasi Asal
+                destination: destinationAddress // Kirim Lokasi Tujuan
             }
         });
     };
@@ -142,7 +138,6 @@ const BookBus = () => {
     return (
         <BookLayout title="Booking Bus">
             
-            {/* 1. Kampus Tujuan */}
             <View className="mb-6">
                 <Text className="text-lg font-PoppinsSemiBold mb-1">Kampus Tujuan</Text>
                 <GoogleTextInput 
@@ -171,7 +166,6 @@ const BookBus = () => {
                 </View>
             </View>
 
-            {/* 2. Kampus Asal */}
             <View className="mb-6">
                 <Text className="text-lg font-PoppinsSemiBold mb-1">Kampus Asal</Text>
                 <GoogleTextInput 
@@ -201,7 +195,6 @@ const BookBus = () => {
                 </View>
             </View>
 
-            {/* 3. Jadwal */}
             <View className="my-3">
                 <Text className="text-lg font-PoppinsSemiBold mb-1">Jadwal Keberangkatan</Text>
                 <View className="flex-row justify-between gap-3">
