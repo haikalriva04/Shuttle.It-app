@@ -6,6 +6,7 @@ const Layout = () => {
         <Stack.Screen name ="(tabs)" options ={{ headerShown: false }} />
         <Stack.Screen name ="book-bus" options ={{ headerShown: false }} />
         <Stack.Screen name ="confirm-book" options ={{ headerShown: false }} />
+        <Stack.Screen name ="book-success" options ={{ headerShown: false }} />
         <Stack.Screen name ="jadwal-alsut" options ={{ headerShown: false }} />
         <Stack.Screen name ="jadwal-anggrek" options ={{ headerShown: false }} />
         <Stack.Screen name ="jadwal-bekasi" options ={{ headerShown: false }} />

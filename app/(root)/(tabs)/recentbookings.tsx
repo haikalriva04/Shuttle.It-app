@@ -3,7 +3,7 @@ import { images } from "@/constants";
 import { ActivityIndicator, FlatList, Image, ImageBackground, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// Moved data from home.tsx
+
 const recentBookings = [
     {
         "ride_id": "1",
@@ -95,7 +95,7 @@ const recentBookings = [
 ];
 
 const RecentBookings = () => {
-  const loading = false; // Set to true if fetching data
+  const loading = false; 
 
   return (
     <ImageBackground

@@ -1,101 +1,88 @@
 import BookLayout from "@/components/BookLayout";
 import CustomButton from "@/components/CustomButton";
-import { icons } from "@/constants";
-import { useLocationStore } from "@/store";
+import { useUser } from "@clerk/clerk-expo";
 import { router, useLocalSearchParams } from "expo-router";
-import { Image, Text, View } from "react-native";
+import { useState } from "react";
+import { Alert, Text, View } from "react-native";
 
 const ConfirmBook = () => {
-    const { userAddress, destinationAddress } = useLocationStore();
-    const { date } = useLocalSearchParams();
+    const { user } = useUser();
+    const params = useLocalSearchParams();
     
-    const bookingDate = date ? new Date(date as string) : new Date();
+    const { date, timeSlot, origin, destination } = params;
+    const [isBooking, setIsBooking] = useState(false);
 
-    // List of items to display in the "slider"
-    const bookingDetails = [
-        {
-            id: '1',
-            label: 'Pick Up',
-            value: userAddress,
-            icon: icons.pickupPin,
-        },
-        {
-            id: '2',
-            label: 'Destination',
-            value: destinationAddress,
-            icon: icons.destination,
-        },
-        {
-            id: '3',
-            label: 'Schedule',
-            value: bookingDate.toLocaleString([], { 
-                weekday: 'short', 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric',
-                hour: '2-digit', 
-                minute: '2-digit' 
-            }),
-            icon: icons.schedule, 
+    const handleConfirmBooking = async () => {
+        setIsBooking(true);
+        try {
+            const dateStr = new Date(date as string).toISOString().split('T')[0];
+
+            const response = await fetch("/(api)/trips", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    user_id: user?.id,
+                    user_name: user?.firstName || "User",
+                    user_email: user?.emailAddresses[0].emailAddress,
+                    origin: origin,
+                    destination: destination,
+                    date: dateStr,
+                    time: timeSlot,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                router.replace("/(root)/book-success"); // Pastikan page ini ada, atau arahkan ke home
+                Alert.alert("Sukses", "Tiket berhasil dibooking!");
+            } else {
+                Alert.alert("Gagal", result.error || "Terjadi kesalahan.");
+            }
+        } catch (error) {
+            console.error(error);
+            Alert.alert("Error", "Gagal menghubungi server.");
+        } finally {
+            setIsBooking(false);
         }
-    ];
-
-    const handleConfirm = () => {
-        
-        router.push("/(root)/(tabs)/home"); 
     };
 
     return (
-        <BookLayout title="Confirm Booking">
-            <View className="flex-1 pb-5">
-                <Text className="text-xl font-PoppinsBold mb-5 text-center">
-                    Trip Summary
-                </Text>
-
-                {/* Render the details as a list */}
-                <View className="flex-col gap-4">
-                    {bookingDetails.map((item) => (
-                        <View 
-                            key={item.id} 
-                            className="flex-row items-center justify-between bg-neutral-100 p-4 rounded-xl shadow-sm shadow-neutral-200"
-                        >
-                            <View className="flex-row items-center gap-4 flex-1">
-                                <View className="w-12 h-12 bg-white rounded-full items-center justify-center shadow-sm">
-                                    <Image 
-                                        source={item.icon} 
-                                        className="w-6 h-6" 
-                                        resizeMode="contain" 
-                                        tintColor="black"
-                                    />
-                                </View>
-                                <View className="flex-1">
-                                    <Text className="text-xs text-gray-500 font-PoppinsMedium uppercase tracking-wider">
-                                        {item.label}
-                                    </Text>
-                                    <Text className="text-base font-PoppinsSemiBold text-black mt-1" numberOfLines={2}>
-                                        {item.value || "Not selected"}
-                                    </Text>
-                                </View>
-                            </View>
-                        </View>
-                    ))}
+        <BookLayout title="Konfirmasi Booking">
+            <View className="bg-white p-5 rounded-2xl shadow-sm border border-neutral-100 mb-5">
+                <Text className="text-gray-500 mb-1">Rute Perjalanan</Text>
+                <View className="flex-row items-center mb-4">
+                     <View className="items-center mr-3">
+                        <View className="w-3 h-3 rounded-full bg-blue-500" />
+                        <View className="w-0.5 h-8 bg-gray-200" />
+                        <View className="w-3 h-3 rounded-full bg-red-500" />
+                    </View>
+                    <View>
+                        <Text className="font-PoppinsSemiBold text-lg">{origin}</Text>
+                        <View className="h-4" /> 
+                        <Text className="font-PoppinsSemiBold text-lg">{destination}</Text>
+                    </View>
                 </View>
 
-                {/* Action Buttons */}
-                <View className="mt-8 gap-3">
-                    <CustomButton 
-                        title="Confirm Ride"
-                        onPress={handleConfirm}
-                        className="w-full shadow-md shadow-blue-300"
-                    />
-                    <CustomButton 
-                        title="Cancel"
-                        bgVariant="outline"
-                        textVariant="primary"
-                        onPress={() => router.back()}
-                        className="w-full"
-                    />
+                <View className="flex-row justify-between bg-neutral-50 p-3 rounded-xl mb-2">
+                    <Text className="text-gray-500">Tanggal</Text>
+                    <Text className="font-PoppinsMedium">{new Date(date as string).toLocaleDateString()}</Text>
                 </View>
+                <View className="flex-row justify-between bg-neutral-50 p-3 rounded-xl">
+                    <Text className="text-gray-500">Jam</Text>
+                    <Text className="font-PoppinsMedium">{timeSlot}</Text>
+                </View>
+            </View>
+
+            <View className="mt-auto mb-10">
+                <CustomButton 
+                    title={isBooking ? "Memproses..." : "Konfirmasi & Book"}
+                    onPress={handleConfirmBooking}
+                    bgVariant={isBooking ? "secondary" : "primary"}
+                    disabled={isBooking}
+                />
             </View>
         </BookLayout>
     );
