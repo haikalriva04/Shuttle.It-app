@@ -15,7 +15,7 @@ const ConfirmBook = () => {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     
     const [bookingData, setBookingData] = useState<{
-        id: string;
+        id: string; 
         origin: string;
         destination: string;
         date: string;
@@ -24,10 +24,7 @@ const ConfirmBook = () => {
 
     const displayDate = date 
         ? new Date(date as string).toLocaleDateString('id-ID', {
-            weekday: 'long',
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
+            weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
           })
         : "-";
 
@@ -35,10 +32,12 @@ const ConfirmBook = () => {
          if (!user) return;
          setIsBooking(true);
 
+         // Generate ID Tiket
          const uniqueCode = `BOOK-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 
          try {
-             const response = await fetch("/(api)/trips", {
+             // POST ke /api/booking
+             const response = await fetch("/(api)/booking", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -72,7 +71,7 @@ const ConfirmBook = () => {
 
          } catch (error) {
              console.error("Booking Error:", error);
-             Alert.alert("Error", "Gagal menghubungi server. Periksa koneksi internet Anda.");
+             Alert.alert("Error", "Gagal menghubungi server.");
          } finally {
              setIsBooking(false);
          }
@@ -81,7 +80,6 @@ const ConfirmBook = () => {
     return (
         <BookLayout title="Konfirmasi Booking" showDirections={true}>
             <View className="bg-white p-5 rounded-2xl shadow-sm border border-neutral-100 mb-5">
-                
                 <View className="flex-row items-start mb-6">
                     <View className="items-center mr-3 mt-1">
                         <View className="w-3 h-3 rounded-full bg-blue-500" />
@@ -90,21 +88,12 @@ const ConfirmBook = () => {
                     </View>
                     <View className="flex-1">
                         <View className="mb-4">
-                            <Text className="text-gray-400 font-PoppinsMedium text-xs uppercase mb-0.5">
-                                Kampus Asal
-                            </Text>
-                            <Text className="font-PoppinsSemiBold text-black text-base leading-5">
-                                {origin || "Lokasi asal belum dipilih"}
-                            </Text>
+                            <Text className="text-gray-400 font-PoppinsMedium text-xs uppercase mb-0.5">Kampus Asal</Text>
+                            <Text className="font-PoppinsSemiBold text-black text-base leading-5">{origin || "Lokasi asal belum dipilih"}</Text>
                         </View>
-
                         <View>
-                            <Text className="text-gray-400 font-PoppinsMedium text-xs uppercase mb-0.5">
-                                Kampus Tujuan
-                            </Text>
-                            <Text className="font-PoppinsSemiBold text-black text-base leading-5">
-                                {destination || "Lokasi tujuan belum dipilih"}
-                            </Text>
+                            <Text className="text-gray-400 font-PoppinsMedium text-xs uppercase mb-0.5">Kampus Tujuan</Text>
+                            <Text className="font-PoppinsSemiBold text-black text-base leading-5">{destination || "Lokasi tujuan belum dipilih"}</Text>
                         </View>
                     </View>
                 </View>
@@ -112,21 +101,15 @@ const ConfirmBook = () => {
                 <View className="h-[1px] bg-neutral-100 w-full mb-4" />
 
                 <View>
-                    <Text className="text-gray-500 mb-2 font-PoppinsMedium text-sm">
-                        Jadwal Keberangkatan
-                    </Text>
+                    <Text className="text-gray-500 mb-2 font-PoppinsMedium text-sm">Jadwal Keberangkatan</Text>
                     <View className="flex-row items-center justify-between bg-neutral-50 p-4 rounded-xl border border-neutral-100">
                         <View>
                             <Text className="text-gray-400 text-xs font-PoppinsMedium mb-1">Tanggal</Text>
-                            <Text className="font-PoppinsSemiBold text-black text-sm">
-                                {displayDate}
-                            </Text>
+                            <Text className="font-PoppinsSemiBold text-black text-sm">{displayDate}</Text>
                         </View>
                         <View className="items-end">
                             <Text className="text-gray-400 text-xs font-PoppinsMedium mb-1">Jam</Text>
-                            <Text className="font-PoppinsBold text-blue-600 text-lg">
-                                {timeSlot || "--:--"}
-                            </Text>
+                            <Text className="font-PoppinsBold text-blue-600 text-lg">{timeSlot || "--:--"}</Text>
                         </View>
                     </View>
                 </View>

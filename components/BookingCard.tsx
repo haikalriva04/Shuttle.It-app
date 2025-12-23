@@ -1,20 +1,62 @@
 import { icons } from "@/constants";
 import React, { useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import TicketModal from "./TicketModal";
 
 interface BookingData {
-  id: string;
+  id: string; // Booking Code
   origin: string;
   destination: string;
-  date: string;      
-  time: string;      
-  bookingDate: string; 
+  date: string;
+  time: string;
+  bookingDate: string;
 }
 
-const BookingCard = ({ item }: { item: BookingData }) => {
+interface BookingCardProps {
+    item: BookingData;
+    onBookingCancelled: () => void;
+}
+
+const BookingCard = ({ item, onBookingCancelled }: BookingCardProps) => {
   const [showModal, setShowModal] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+
+  const handleCancelBooking = async () => {
+    Alert.alert(
+        "Batalkan Booking",
+        "Apakah Anda yakin ingin membatalkan booking ini? Kursi Anda akan diberikan ke orang lain.",
+        [
+            { text: "Tidak", style: "cancel" },
+            { 
+                text: "Ya, Batalkan", 
+                style: "destructive",
+                onPress: async () => {
+                    setIsCancelling(true);
+                    try {
+                        // Panggil API DELETE
+                        const response = await fetch(`/(api)/booking?booking_code=${item.id}`, {
+                            method: "DELETE",
+                        });
+
+                        if (response.ok) {
+                            setShowModal(false);
+                            onBookingCancelled(); // Refresh List
+                            Alert.alert("Berhasil", "Booking berhasil dibatalkan.");
+                        } else {
+                            const result = await response.json();
+                            Alert.alert("Gagal", result.error || "Gagal membatalkan booking.");
+                        }
+                    } catch (error) {
+                        Alert.alert("Error", "Gagal terhubung ke server.");
+                    } finally {
+                        setIsCancelling(false);
+                    }
+                }
+            }
+        ]
+    );
+  };
 
   return (
     <>
@@ -26,7 +68,6 @@ const BookingCard = ({ item }: { item: BookingData }) => {
         <View className="w-[85px] bg-blue-50/50 justify-center items-center border-r border-dashed border-gray-200 relative">
             <View className="absolute -top-1.5 -right-1.5 w-3 h-3 bg-white rounded-full z-10" />
             <View className="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-white rounded-full z-10" />
-            
             <QRCode value={item.id} size={50} color="black" backgroundColor="transparent"/>
         </View>
 
@@ -69,6 +110,9 @@ const BookingCard = ({ item }: { item: BookingData }) => {
             date: item.date,
             time: item.time,
         }}
+        allowCancellation={true} // Aktifkan tombol cancel di sini
+        onCancelBooking={handleCancelBooking}
+        isCancelling={isCancelling}
       />
     </>
   );

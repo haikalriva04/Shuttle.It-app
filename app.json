@@ -8,6 +8,11 @@
     "scheme": "shuttleit",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/splash-screen.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "ios": {
       "supportsTablet": true
     },
@@ -29,14 +34,6 @@
         "expo-router",
         {
           "origin": "https://uber.com/"
-        }
-      ],
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-screen",
-          "resizeMode": "contain",
-          "backgroundColor": "#0097DA"
         }
       ],
       "expo-secure-store",

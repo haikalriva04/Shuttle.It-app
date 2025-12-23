@@ -35,7 +35,7 @@ export async function GET(request: Request) {
   
   const originFull = searchParams.get('origin');
   const destinationFull = searchParams.get('destination');
-  const dateStr = searchParams.get('date'); // YYYY-MM-DD
+  const dateStr = searchParams.get('date');
 
   if (!originFull || !destinationFull || !dateStr) {
     return Response.json({ error: 'Missing parameters' }, { status: 400 });
@@ -62,6 +62,7 @@ export async function GET(request: Request) {
   }
 
   try {
+    // Logic: Hitung berapa orang yang sudah booking di tabel bookings
     const bookings = await sql`
       SELECT departure_time, COUNT(*) as count 
       FROM bookings 
@@ -86,53 +87,7 @@ export async function GET(request: Request) {
 
     return Response.json({ data: result });
   } catch (error) {
-    console.error("Database Error:", error);
+    console.error("Trips API Error:", error);
     return Response.json({ error: 'Internal Server Error' }, { status: 500 });
-  }
-}
-
-export async function POST(request: Request) {
-  const sql = neon(`${process.env.DATABASE_URL}`);
-  
-  try {
-    const { 
-        user_id, user_name, user_email, 
-        origin, destination, date, time, 
-        booking_code 
-    } = await request.json();
-
-    if (!user_id || !origin || !destination || !date || !time || !booking_code) {
-        return Response.json({ error: "Data tidak lengkap" }, { status: 400 });
-    }
-
-    const existing = await sql`
-        SELECT COUNT(*) as count FROM bookings 
-        WHERE origin=${origin} AND destination=${destination} 
-        AND departure_date=${date} AND departure_time=${time}
-    `;
-
-    if (existing[0].count >= 30) {
-        return Response.json({ error: "Maaf, bus sudah penuh!" }, { status: 400 });
-    }
-
-    await sql`
-        INSERT INTO bookings (
-            booking_code, user_id, user_name, user_email, 
-            origin, destination, departure_date, departure_time, seats_booked
-        )
-        VALUES (
-            ${booking_code}, ${user_id}, ${user_name}, ${user_email}, 
-            ${origin}, ${destination}, ${date}, ${time}, 1
-        )
-    `;
-
-    return Response.json({ success: true, booking_code: booking_code });
-
-  } catch (error) {
-    console.error("Booking Error:", error);
-    if (error.code === '23505') { 
-        return Response.json({ error: "Booking code duplicate, try again." }, { status: 409 });
-    }
-    return Response.json({ error: "Gagal memproses booking" }, { status: 500 });
   }
 }

@@ -1,68 +1,54 @@
 import { neon } from "@neondatabase/serverless";
 
+// 1. POST: Membuat Booking Baru & Validasi Kursi
 export async function POST(request: Request) {
   try {
     const sql = neon(`${process.env.DATABASE_URL}`);
     const { 
-      user_id, username, email, 
-      origin, destination, departure_date, departure_time, 
-      booking_code 
+        user_id, user_name, user_email, 
+        origin, destination, date, time, 
+        booking_code 
     } = await request.json();
 
-    if (!user_id || !origin || !departure_date || !booking_code) {
-      return Response.json({ error: "Data tidak lengkap" }, { status: 400 });
+    if (!user_id || !origin || !destination || !date || !time || !booking_code) {
+        return Response.json({ error: "Data tidak lengkap" }, { status: 400 });
     }
 
-    const checkTrip = await sql`
-      SELECT seats_available 
-      FROM trips 
-      WHERE origin = ${origin} 
-      AND destination = ${destination}
-      AND departure_date = ${departure_date}::DATE
-      AND departure_time = ${departure_time}
+    // Cek apakah kursi sudah penuh (Mencegah overbooking)
+    const existing = await sql`
+        SELECT COUNT(*) as count FROM bookings 
+        WHERE origin=${origin} AND destination=${destination} 
+        AND departure_date=${date} AND departure_time=${time}
     `;
 
-    if (checkTrip.length === 0) {
-        return Response.json({ error: "Jadwal tidak ditemukan" }, { status: 404 });
+    if (existing[0].count >= 30) {
+        return Response.json({ error: "Maaf, bus sudah penuh!" }, { status: 400 });
     }
 
-    const currentSeats = checkTrip[0].seats_available;
+    // Insert Booking Baru
+    await sql`
+        INSERT INTO bookings (
+            booking_code, user_id, user_name, user_email, 
+            origin, destination, departure_date, departure_time, seats_booked
+        )
+        VALUES (
+            ${booking_code}, ${user_id}, ${user_name}, ${user_email}, 
+            ${origin}, ${destination}, ${date}, ${time}, 1
+        )
+    `;
 
-    if (currentSeats <= 0) {
-        return Response.json({ error: "Kursi Penuh" }, { status: 400 });
+    return Response.json({ success: true, booking_code: booking_code });
+
+  } catch (error: any) {
+    console.error("Booking POST Error:", error);
+    if (error.code === '23505') { 
+        return Response.json({ error: "Terjadi kesalahan (Duplicate Code), coba lagi." }, { status: 409 });
     }
-
-    const newBooking = await sql`
-      INSERT INTO bookings (
-        user_id, username, email, booking_code, 
-        origin, destination, departure_date, departure_time, seats_booked
-      ) 
-      VALUES (
-        ${user_id}, ${username}, ${email}, ${booking_code},
-        ${origin}, ${destination}, ${departure_date}, ${departure_time}, 1
-      )
-      RETURNING *;
-    `;
-
-    const updatedTrip = await sql`
-      UPDATE trips 
-      SET seats_available = seats_available - 1,
-          status = CASE WHEN (seats_available - 1) <= 0 THEN 'FULL' ELSE 'AVAILABLE' END
-      WHERE origin = ${origin} 
-      AND destination = ${destination}
-      AND departure_date = ${departure_date}::DATE
-      AND departure_time = ${departure_time}
-      RETURNING seats_available;
-    `;
-
-    return Response.json({ data: newBooking[0], remaining_seats: updatedTrip[0].seats_available });
-
-  } catch (error) {
-    console.error("Booking Error:", error);
-    return Response.json({ error: "Internal Server Error" }, { status: 500 });
+    return Response.json({ error: "Gagal memproses booking" }, { status: 500 });
   }
 }
 
+// 2. GET: Mengambil History Booking User
 export async function GET(request: Request) {
     try {
         const sql = neon(`${process.env.DATABASE_URL}`);
@@ -81,7 +67,36 @@ export async function GET(request: Request) {
 
         return Response.json({ data: bookings });
     } catch (error) {
-        console.error(error);
-        return Response.json({ error: error }, { status: 500 });
+        console.error("Booking GET Error:", error);
+        return Response.json({ error: "Internal Server Error" }, { status: 500 });
     }
+}
+
+// 3. DELETE: Membatalkan Booking
+export async function DELETE(request: Request) {
+  try {
+    const sql = neon(`${process.env.DATABASE_URL}`);
+    const { searchParams } = new URL(request.url);
+    const booking_code = searchParams.get("booking_code");
+
+    if (!booking_code) {
+      return Response.json({ error: "Booking Code Missing" }, { status: 400 });
+    }
+
+    const deletedBooking = await sql`
+        DELETE FROM bookings 
+        WHERE booking_code = ${booking_code}
+        RETURNING *;
+    `;
+
+    if (deletedBooking.length === 0) {
+        return Response.json({ error: "Booking tidak ditemukan" }, { status: 404 });
+    }
+
+    return Response.json({ message: "Booking berhasil dibatalkan" });
+
+  } catch (error) {
+    console.error("Booking DELETE Error:", error);
+    return Response.json({ error: "Internal Server Error" }, { status: 500 });
+  }
 }
