@@ -61,6 +61,13 @@ const TicketModal = ({ isVisible, onClose, type, data }: TicketModalProps) => {
             />
           </View>
 
+               {/* Tanggal Booking Dilakukan (Opsional/Footer info) */}
+             <View className="mb-3 items-center">
+                <Text className="text-[10px] text-gray-400 font-PoppinsRegular">
+                    Booking ID: {data.id}
+                </Text>
+            </View>
+
           {/* Informasi Detail Tiket */}
           <View className="w-full space-y-4">
             {/* Kampus Asal & Tujuan */}
@@ -69,7 +76,7 @@ const TicketModal = ({ isVisible, onClose, type, data }: TicketModalProps) => {
                     <Text className="text-xs font-PoppinsMedium text-gray-400 uppercase">Asal</Text>
                     <Text className="text-xs font-PoppinsMedium text-gray-400 uppercase">Tujuan</Text>
                 </View>
-                <View className="flex-row items-center justify-between">
+                <View className="flex-row items-center justify-between mb-2">
                     <Text className="font-PoppinsSemiBold text-black text-sm max-w-[45%]">{data.origin}</Text>
                     <Image source={icons.rightArrow} className="w-4 h-4 opacity-30" resizeMode="contain"/>
                     <Text className="font-PoppinsSemiBold text-black text-sm text-right max-w-[45%]">{data.destination}</Text>
@@ -79,23 +86,16 @@ const TicketModal = ({ isVisible, onClose, type, data }: TicketModalProps) => {
             <View className="h-[1px] bg-neutral-100 w-full" />
 
             {/* Jadwal */}
-            <View className="flex-row justify-between items-center mt-3">
+            <View className="flex-row justify-between items-center mt-2">
                 <View>
                     <Text className="text-xs font-PoppinsMedium text-gray-400 mb-1">Jadwal Keberangkatan</Text>
-                    <Text className="font-PoppinsBold text-black text-base">
+                    <Text className="font-PoppinsBold text-black text-sm">
                         {data.date}
                     </Text>
                 </View>
-                <View className="bg-blue-50 px-3 py-2 rounded-lg">
+                <View className="bg-blue-50 px-1 py-1 rounded-lg">
                     <Text className="font-PoppinsBold text-blue-600 text-base">{data.time}</Text>
                 </View>
-            </View>
-
-             {/* Tanggal Booking Dilakukan (Opsional/Footer info) */}
-             <View className="mt-2 items-center">
-                <Text className="text-[10px] text-gray-400 font-PoppinsRegular">
-                    Booking ID: {data.id}
-                </Text>
             </View>
           </View>
 
