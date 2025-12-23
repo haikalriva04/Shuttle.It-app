@@ -1,18 +1,21 @@
 import BookLayout from "@/components/BookLayout";
 import CustomButton from "@/components/CustomButton";
+import TicketModal from "@/components/TicketModal"; // Import Modal
 import { useUser } from "@clerk/clerk-expo";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Alert, Text, View } from "react-native";
 
 const ConfirmBook = () => {
-    // ... (kode logika state & handler tetap sama) ...
     const { user } = useUser();
     const params = useLocalSearchParams();
     const { date, timeSlot, origin, destination } = params;
+    
     const [isBooking, setIsBooking] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [bookingId, setBookingId] = useState("");
 
-    // Format Tanggal
+    // Format Tanggal untuk Tampilan
     const formattedDate = date 
         ? new Date(date as string).toLocaleDateString('id-ID', {
             weekday: 'long',
@@ -23,14 +26,20 @@ const ConfirmBook = () => {
         : "-";
 
     const handleConfirmBooking = async () => {
-         // ... (logika handleConfirmBooking tetap sama) ...
          setIsBooking(true);
          try {
-             // ... fetch logic ...
-             // Simulasikan success/fail seperti di file asli
-             // Jika sukses:
-             Alert.alert("Sukses", "Tiket berhasil dibooking!");
-             router.replace("/(root)/(tabs)/home"); 
+             // ... Logic Fetch/Post ke Database Anda di sini ...
+             
+             // SIMULASI GENERATE UNIQUE ID UNTUK QR CODE
+             // Format: BOOK-[TIMESTAMP]-[RANDOM]
+             const uniqueId = `BOOK-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+             setBookingId(uniqueId);
+
+             // Tampilkan Modal Sukses alih-alih langsung redirect
+             setTimeout(() => {
+                setShowSuccessModal(true);
+             }, 500); // Sedikit delay simulasi loading
+
          } catch (error) {
              console.error(error);
              Alert.alert("Error", "Gagal menghubungi server.");
@@ -40,7 +49,6 @@ const ConfirmBook = () => {
     };
 
     return (
-        // Tambahkan prop showDirections={true} di sini
         <BookLayout title="Konfirmasi Booking" showDirections={true}>
             <View className="bg-white p-5 rounded-2xl shadow-sm border border-neutral-100 mb-5">
                 
@@ -94,9 +102,9 @@ const ConfirmBook = () => {
                         </View>
                     </View>
                 </View>
-
             </View>
 
+            {/* Tombol Konfirmasi */}
             <View className="mt-auto mb-10">
                 <CustomButton 
                     title={isBooking ? "Memproses..." : "Konfirmasi Booking"}
@@ -106,6 +114,20 @@ const ConfirmBook = () => {
                     className="shadow-md shadow-neutral-300"
                 />
             </View>
+
+            {/* Modal Validasi (Pop-up) */}
+            <TicketModal 
+                isVisible={showSuccessModal}
+                onClose={() => setShowSuccessModal(false)}
+                type="booking"
+                data={{
+                    id: bookingId,
+                    origin: (origin as string) || "Asal",
+                    destination: (destination as string) || "Tujuan",
+                    date: formattedDate,
+                    time: (timeSlot as string) || "Jam"
+                }}
+            />
         </BookLayout>
     );
 };
