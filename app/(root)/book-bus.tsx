@@ -8,6 +8,7 @@ import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, Image, Modal, Platform, Text, TouchableOpacity, View } from "react-native";
 
+
 const BINUS_LOCATIONS = [
     {
         description: "BINUS @ Alam Sutera Campus",
@@ -69,7 +70,7 @@ const BookBus = () => {
             setSelectedTime(null); 
 
             try {
-                const dateStr = date.toISOString().split('T')[0];
+                const dateStr = date.toLocaleDateString('en-CA'); 
                 
                 const response = await fetch(
                     `/(api)/trips?origin=${encodeURIComponent(userAddress)}&destination=${encodeURIComponent(destinationAddress)}&date=${dateStr}`
@@ -109,14 +110,13 @@ const BookBus = () => {
             return;
         }
 
-        // PERBAIKAN DI SINI: Mengirim data origin & destination
         router.push({
             pathname: "/(root)/confirm-book",
             params: { 
-                date: date.toISOString(),
+                date: date.toLocaleDateString('en-CA'), // Kirim format standar YYYY-MM-DD
                 timeSlot: selectedTime, 
-                origin: userAddress,          // Kirim Lokasi Asal
-                destination: destinationAddress // Kirim Lokasi Tujuan
+                origin: userAddress,
+                destination: destinationAddress
             }
         });
     };
@@ -129,7 +129,7 @@ const BookBus = () => {
         };
         if (type === 'destination') {
             setDestinationLocation(locationData);
-            setUserLocation({ latitude: 0, longitude: 0, address: "" });
+            setUserLocation({ latitude: 0, longitude: 0, address: "" }); // Reset asal jika tujuan berubah
         } else {
             setUserLocation(locationData);
         }
@@ -198,13 +198,14 @@ const BookBus = () => {
             <View className="my-3">
                 <Text className="text-lg font-PoppinsSemiBold mb-1">Jadwal Keberangkatan</Text>
                 <View className="flex-row justify-between gap-3">
+                    {/* Date Picker Button */}
                     <TouchableOpacity 
                         onPress={() => setShowDatePicker(true)}
                         className="flex-1 bg-white p-3 rounded-xl flex-row items-center justify-center shadow-md shadow-neutral-300"
                     >
                         <Image source={icons.schedule} className="w-5 h-5 mr-2" resizeMode="contain" tintColor="black"/>
                         <Text className="font-PoppinsMedium text-sm text-black">
-                            {date.toLocaleDateString()}
+                            {date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </Text>
                     </TouchableOpacity>
 
@@ -247,7 +248,7 @@ const BookBus = () => {
                                             disabled={item.is_full}
                                             onPress={() => { setSelectedTime(item.time); setShowTimeModal(false); }}
                                             className={`p-4 mb-3 rounded-xl border flex-row justify-between items-center
-                                                ${item.is_full ? "bg-gray-100 border-gray-200" : 
+                                                ${item.is_full ? "bg-gray-100 border-gray-200 opacity-60" : 
                                                   selectedTime === item.time ? "bg-blue-100 border-blue-500" : "bg-neutral-50 border-neutral-200"}`}
                                         >
                                             <View>
@@ -257,7 +258,7 @@ const BookBus = () => {
                                             </View>
                                             <View className="flex-row items-center">
                                                 <Text className={`text-xs font-bold mr-1 ${item.is_full ? "text-red-500" : "text-green-600"}`}>
-                                                    {item.is_full ? "PENUH" : `${item.seats_available} Kursi`}
+                                                    {item.is_full ? "KURSI PENUH" : `${item.seats_available} Kursi`}
                                                 </Text>
                                             </View>
                                         </TouchableOpacity>
@@ -276,7 +277,7 @@ const BookBus = () => {
 
             <View className="mt-5 mb-10">
                 <CustomButton 
-                    title="Book Bus"
+                    title="Lanjut ke Konfirmasi"
                     onPress={handleBook}
                     className="w-full shadow-md shadow-neutral-400"
                 />

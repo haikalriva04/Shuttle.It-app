@@ -1,4 +1,4 @@
-import { icons } from "@/constants"; // Import icons dari constants
+import { icons } from "@/constants";
 import { calculateRegion } from "@/lib/map";
 import { useLocationStore } from "@/store";
 import { useRef } from "react";
@@ -20,7 +20,6 @@ const Map = ({ showDirections = false }: MapProps) => {
         destinationLongitude, 
     } = useLocationStore();
 
-    // 1. Buat Ref untuk MapView
     const mapRef = useRef<MapView>(null);
 
     const region = calculateRegion({
@@ -33,7 +32,7 @@ const Map = ({ showDirections = false }: MapProps) => {
     return(
         <View style={{flex:1}}>
             <MapView 
-                ref={mapRef} // 2. Hubungkan Ref ke MapView
+                ref={mapRef}
                 style={{flex:1}} 
                 provider={PROVIDER_DEFAULT} 
                 className="w-full h-full rounded-2xl" 
@@ -43,7 +42,6 @@ const Map = ({ showDirections = false }: MapProps) => {
                 userInterfaceStyle="dark"
                 showsUserLocation={true}
             >
-                {/* 3. Render Marker Kampus Tujuan dengan Icon Custom */}
                 {destinationLatitude && destinationLongitude && (
                     <Marker
                         key="destination"
@@ -52,11 +50,10 @@ const Map = ({ showDirections = false }: MapProps) => {
                             longitude: destinationLongitude,
                         }}
                         title="Kampus Tujuan"
-                        image={icons.pinKampusTujuan} // Menggunakan icon pinKampusTujuan
+                        image={icons.pinKampusTujuan}
                     />
                 )}
 
-                {/* 4. Render Directions jika showDirections aktif */}
                 {showDirections && userLatitude && userLongitude && destinationLatitude && destinationLongitude && (
                     <MapViewDirections
                         origin={{
@@ -70,14 +67,13 @@ const Map = ({ showDirections = false }: MapProps) => {
                         apikey={process.env.EXPO_PUBLIC_GOOGLE_API_KEY!}
                         strokeWidth={4}
                         strokeColor="#0286FF"
-                        // 5. Zoom otomatis saat rute siap
                         onReady={(result) => {
                             mapRef.current?.fitToCoordinates(result.coordinates, {
                                 edgePadding: {
                                     top: 60,     
                                     right: 20,   
                                     left: 20,    
-                                    bottom: (height * 0.5) + 30, // Padding agar tidak tertutup bottom sheet
+                                    bottom: (height * 0.5) + 30,
                                 },
                                 animated: true,
                             });

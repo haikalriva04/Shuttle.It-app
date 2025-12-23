@@ -12,8 +12,8 @@ export const generateMarkersFromData = ({
   userLongitude: number;
 }): MarkerData[] => {
   return data.map((driver) => {
-    const latOffset = (Math.random() - 0.5) * 0.01; // Random offset between -0.005 and 0.005
-    const lngOffset = (Math.random() - 0.5) * 0.01; // Random offset between -0.005 and 0.005
+    const latOffset = (Math.random() - 0.5) * 0.01; 
+    const lngOffset = (Math.random() - 0.5) * 0.01;
 
     return {
       latitude: userLatitude + latOffset,
@@ -58,8 +58,8 @@ export const calculateRegion = ({
   const minLng = Math.min(userLongitude, destinationLongitude);
   const maxLng = Math.max(userLongitude, destinationLongitude);
 
-  const latitudeDelta = (maxLat - minLat) * 1.3; // Adding some padding
-  const longitudeDelta = (maxLng - minLng) * 1.3; // Adding some padding
+  const latitudeDelta = (maxLat - minLat) * 1.3; 
+  const longitudeDelta = (maxLng - minLng) * 1.3; 
 
   const latitude = (userLatitude + destinationLatitude) / 2;
   const longitude = (userLongitude + destinationLongitude) / 2;

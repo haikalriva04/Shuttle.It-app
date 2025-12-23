@@ -1,6 +1,6 @@
 import BookLayout from "@/components/BookLayout";
 import CustomButton from "@/components/CustomButton";
-import TicketModal from "@/components/TicketModal"; // Import Modal
+import TicketModal from "@/components/TicketModal";
 import { useUser } from "@clerk/clerk-expo";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
@@ -13,10 +13,16 @@ const ConfirmBook = () => {
     
     const [isBooking, setIsBooking] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
-    const [bookingId, setBookingId] = useState("");
+    
+    const [bookingData, setBookingData] = useState<{
+        id: string;
+        origin: string;
+        destination: string;
+        date: string;
+        time: string;
+    } | null>(null);
 
-    // Format Tanggal untuk Tampilan
-    const formattedDate = date 
+    const displayDate = date 
         ? new Date(date as string).toLocaleDateString('id-ID', {
             weekday: 'long',
             day: 'numeric',
@@ -26,23 +32,47 @@ const ConfirmBook = () => {
         : "-";
 
     const handleConfirmBooking = async () => {
+         if (!user) return;
          setIsBooking(true);
-         try {
-             // ... Logic Fetch/Post ke Database Anda di sini ...
-             
-             // SIMULASI GENERATE UNIQUE ID UNTUK QR CODE
-             // Format: BOOK-[TIMESTAMP]-[RANDOM]
-             const uniqueId = `BOOK-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-             setBookingId(uniqueId);
 
-             // Tampilkan Modal Sukses alih-alih langsung redirect
-             setTimeout(() => {
-                setShowSuccessModal(true);
-             }, 500); // Sedikit delay simulasi loading
+         const uniqueCode = `BOOK-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+
+         try {
+             const response = await fetch("/(api)/trips", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    user_id: user.id,
+                    user_name: user.fullName || user.username,
+                    user_email: user.primaryEmailAddress?.emailAddress,
+                    origin: origin,
+                    destination: destination,
+                    date: date,
+                    time: timeSlot,
+                    booking_code: uniqueCode,
+                }),
+             });
+
+             const result = await response.json();
+
+             if (!response.ok) {
+                 Alert.alert("Gagal", result.error || "Terjadi kesalahan saat booking.");
+                 return;
+             }
+
+             setBookingData({
+                 id: uniqueCode,
+                 origin: origin as string,
+                 destination: destination as string,
+                 date: displayDate,
+                 time: timeSlot as string
+             });
+
+             setShowSuccessModal(true);
 
          } catch (error) {
-             console.error(error);
-             Alert.alert("Error", "Gagal menghubungi server.");
+             console.error("Booking Error:", error);
+             Alert.alert("Error", "Gagal menghubungi server. Periksa koneksi internet Anda.");
          } finally {
              setIsBooking(false);
          }
@@ -52,7 +82,6 @@ const ConfirmBook = () => {
         <BookLayout title="Konfirmasi Booking" showDirections={true}>
             <View className="bg-white p-5 rounded-2xl shadow-sm border border-neutral-100 mb-5">
                 
-                {/* Visualisasi Rute */}
                 <View className="flex-row items-start mb-6">
                     <View className="items-center mr-3 mt-1">
                         <View className="w-3 h-3 rounded-full bg-blue-500" />
@@ -82,7 +111,6 @@ const ConfirmBook = () => {
 
                 <View className="h-[1px] bg-neutral-100 w-full mb-4" />
 
-                {/* Jadwal Keberangkatan */}
                 <View>
                     <Text className="text-gray-500 mb-2 font-PoppinsMedium text-sm">
                         Jadwal Keberangkatan
@@ -91,7 +119,7 @@ const ConfirmBook = () => {
                         <View>
                             <Text className="text-gray-400 text-xs font-PoppinsMedium mb-1">Tanggal</Text>
                             <Text className="font-PoppinsSemiBold text-black text-sm">
-                                {formattedDate}
+                                {displayDate}
                             </Text>
                         </View>
                         <View className="items-end">
@@ -104,7 +132,6 @@ const ConfirmBook = () => {
                 </View>
             </View>
 
-            {/* Tombol Konfirmasi */}
             <View className="mt-auto mb-10">
                 <CustomButton 
                     title={isBooking ? "Memproses..." : "Konfirmasi Booking"}
@@ -115,19 +142,14 @@ const ConfirmBook = () => {
                 />
             </View>
 
-            {/* Modal Validasi (Pop-up) */}
-            <TicketModal 
-                isVisible={showSuccessModal}
-                onClose={() => setShowSuccessModal(false)}
-                type="booking"
-                data={{
-                    id: bookingId,
-                    origin: (origin as string) || "Asal",
-                    destination: (destination as string) || "Tujuan",
-                    date: formattedDate,
-                    time: (timeSlot as string) || "Jam"
-                }}
-            />
+            {bookingData && (
+                <TicketModal 
+                    isVisible={showSuccessModal}
+                    onClose={() => setShowSuccessModal(false)}
+                    type="booking"
+                    data={bookingData}
+                />
+            )}
         </BookLayout>
     );
 };

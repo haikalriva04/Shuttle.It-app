@@ -2,16 +2,15 @@ import { icons } from "@/constants";
 import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
-import TicketModal from "./TicketModal"; // Import modal yang baru dibuat
+import TicketModal from "./TicketModal";
 
-// Definisikan tipe data props
 interface BookingData {
   id: string;
   origin: string;
   destination: string;
-  date: string;      // Tanggal Jadwal
-  time: string;      // Jam Jadwal
-  bookingDate: string; // Tanggal Booking dibuat
+  date: string;      
+  time: string;      
+  bookingDate: string; 
 }
 
 const BookingCard = ({ item }: { item: BookingData }) => {
@@ -24,18 +23,14 @@ const BookingCard = ({ item }: { item: BookingData }) => {
         className="bg-white rounded-2xl mb-4 shadow-sm border border-neutral-100 flex-row overflow-hidden mx-5 h-[100px]"
         activeOpacity={0.7}
       >
-        {/* Bagian Kiri: QR Code Kecil */}
         <View className="w-[85px] bg-blue-50/50 justify-center items-center border-r border-dashed border-gray-200 relative">
-             {/* "Gigi" tiket dekorasi di atas dan bawah garis putus */}
             <View className="absolute -top-1.5 -right-1.5 w-3 h-3 bg-white rounded-full z-10" />
             <View className="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-white rounded-full z-10" />
             
             <QRCode value={item.id} size={50} color="black" backgroundColor="transparent"/>
         </View>
 
-        {/* Bagian Kanan: Informasi Booking */}
         <View className="flex-1 p-3 justify-center bg-white">
-            {/* Rute */}
             <View className="flex-row items-center mb-2">
                 <Text className="text-xs font-PoppinsBold text-neutral-800 flex-1" numberOfLines={1}>
                     {item.origin}
@@ -46,10 +41,8 @@ const BookingCard = ({ item }: { item: BookingData }) => {
                 </Text>
             </View>
 
-            {/* Garis Pemisah */}
             <View className="h-[1px] bg-neutral-100 w-full mb-2" />
 
-            {/* Jadwal Info */}
             <View className="flex-row justify-between items-end">
                 <View>
                     <Text className="text-[10px] text-gray-400 font-PoppinsMedium">Jadwal</Text>
@@ -65,7 +58,6 @@ const BookingCard = ({ item }: { item: BookingData }) => {
         </View>
       </TouchableOpacity>
 
-      {/* Modal Detail untuk Card Ini */}
       <TicketModal
         isVisible={showModal}
         onClose={() => setShowModal(false)}

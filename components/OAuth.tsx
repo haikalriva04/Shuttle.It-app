@@ -8,7 +8,6 @@ import { Alert, Image, Text, View } from "react-native";
 import CustomButton from "@/components/CustomButton";
 import { icons } from "@/constants";
 
-// Helper to warm up the browser for Android
 export const useWarmUpBrowser = () => {
   useEffect(() => {
     void WebBrowser.warmUpAsync();
@@ -27,22 +26,18 @@ const OAuth = () => {
 
   const handleMicrosoftSignIn = async () => {
     try {
-      // Create the redirect URL for Expo
       const redirectUrl = Linking.createURL("/(root)/(tabs)/home", { scheme: "shuttleit" });
 
       const { createdSessionId, setActive, signUp, signIn } = await startOAuthFlow({
         redirectUrl,
       });
 
-      // If login is successful
       if (createdSessionId) {
         if (setActive) {
           await setActive({ session: createdSessionId });
           router.replace("/(root)/(tabs)/home");
         }
       } else {
-        // If the flow requires further steps (like MFA), handle it here
-        // For simple login, this might not be hit often
       }
     } catch (err) {
       console.error("OAuth error", err);

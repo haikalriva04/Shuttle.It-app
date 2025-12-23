@@ -8,14 +8,14 @@ import QRCode from "react-native-qrcode-svg";
 interface TicketModalProps {
   isVisible: boolean;
   onClose: () => void;
-  type: "booking" | "history"; // Membedakan tampilan Booking baru vs History
+  type: "booking" | "history";
   data: {
-    id: string; // Data untuk QR Code
+    id: string; 
     date: string;
     time: string;
     origin: string;
     destination: string;
-    createdAt?: string; // Tanggal booking dilakukan
+    createdAt?: string;
   };
 }
 
@@ -23,17 +23,15 @@ const TicketModal = ({ isVisible, onClose, type, data }: TicketModalProps) => {
   return (
     <Modal
       isVisible={isVisible}
-      onBackdropPress={type === "history" ? onClose : undefined} // History bisa tutup tap luar
-      backdropOpacity={0.7} // Layer hitam transparan gelap
+      onBackdropPress={type === "history" ? onClose : undefined} 
+      backdropOpacity={0.7}
       animationIn="zoomIn"
       animationOut="zoomOut"
       useNativeDriver
     >
       <View className="flex-1 justify-center items-center">
-        {/* Container Bentuk Tiket Vertikal */}
         <View className="bg-white w-[85%] rounded-3xl p-6 items-center shadow-lg relative overflow-hidden">
           
-          {/* Tombol Close (Hanya untuk History) */}
           {type === "history" && (
             <TouchableOpacity 
               onPress={onClose} 
@@ -43,7 +41,6 @@ const TicketModal = ({ isVisible, onClose, type, data }: TicketModalProps) => {
             </TouchableOpacity>
           )}
 
-          {/* Header Text */}
           <View className="items-center mb-6 mt-2">
             <Text className="font-PoppinsExtraBold text-xl text-black text-center">
               Booking Berhasil !
@@ -53,7 +50,6 @@ const TicketModal = ({ isVisible, onClose, type, data }: TicketModalProps) => {
             </Text>
           </View>
 
-          {/* QR Code Area */}
           <View className="mb-6 border-2 border-dashed border-gray-200 p-4 rounded-xl">
             <QRCode
               value={data.id || "INVALID"}
@@ -61,14 +57,12 @@ const TicketModal = ({ isVisible, onClose, type, data }: TicketModalProps) => {
             />
           </View>
 
-               {/* Tanggal Booking Dilakukan (Opsional/Footer info) */}
              <View className="mb-3 items-center">
                 <Text className="text-[10px] text-gray-400 font-PoppinsRegular">
                     Booking ID: {data.id}
                 </Text>
             </View>
 
-          {/* Informasi Detail Tiket */}
           <View className="w-full space-y-4">
             {/* Kampus Asal & Tujuan */}
             <View>
@@ -85,7 +79,6 @@ const TicketModal = ({ isVisible, onClose, type, data }: TicketModalProps) => {
 
             <View className="h-[1px] bg-neutral-100 w-full" />
 
-            {/* Jadwal */}
             <View className="flex-row justify-between items-center mt-2">
                 <View>
                     <Text className="text-xs font-PoppinsMedium text-gray-400 mb-1">Jadwal Keberangkatan</Text>
@@ -99,7 +92,6 @@ const TicketModal = ({ isVisible, onClose, type, data }: TicketModalProps) => {
             </View>
           </View>
 
-          {/* Tombol 'Kembali ke Home' (Hanya untuk Booking Baru) */}
           {type === "booking" && (
             <TouchableOpacity
               onPress={() => {

@@ -1,32 +1,53 @@
 import BookingCard from "@/components/BookingCard";
 import { images } from "@/constants";
-import { useState } from "react";
-import { ActivityIndicator, FlatList, Image, ImageBackground, SafeAreaView, Text, View } from "react-native";
-
-// Data Dummy untuk testing (Bisa diganti dengan data fetch API nanti)
-// Kosongkan array ini [] untuk mengetes tampilan ListEmptyComponent
-const MOCK_DATA = [
-    {
-        id: "BOOK-17348922-001",
-        origin: "Binus @Alam Sutera",
-        destination: "Binus @Kemanggisan",
-        date: "Senin, 22 Des 2025",
-        time: "09:00 WIB",
-        bookingDate: "20 Des 2025"
-    },
-    {
-        id: "BOOK-17348922-002",
-        origin: "Binus @Kemanggisan",
-        destination: "Binus @Bekasi",
-        date: "Selasa, 23 Des 2025",
-        time: "13:00 WIB",
-        bookingDate: "21 Des 2025"
-    }
-];
+import { useUser } from "@clerk/clerk-expo";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
+import { ActivityIndicator, FlatList, Image, ImageBackground, RefreshControl, SafeAreaView, Text, View } from "react-native";
 
 const RecentBookings = () => {
-  const [loading, setLoading] = useState(false);
-  const [bookings, setBookings] = useState(MOCK_DATA); // Gunakan MOCK_DATA atau []
+  const { user } = useUser();
+  const [loading, setLoading] = useState(true);
+  const [bookings, setBookings] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  
+  const fetchBookings = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+        const response = await fetch(`/(api)/booking?user_id=${user.id}`);
+        const result = await response.json();
+
+        if (response.ok) {
+            const mappedData = result.data.map((item: any) => ({
+                id: item.booking_code,
+                origin: item.origin,
+                destination: item.destination,
+                date: item.departure_date,
+                time: item.departure_time,
+                bookingDate: new Date(item.created_at).toLocaleDateString('id-ID'),
+            }));
+            setBookings(mappedData);
+        }
+    } catch (error) {
+        console.error("Fetch history error:", error);
+    } finally {
+        setLoading(false);
+        setRefreshing(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+        fetchBookings();
+    }, [user])
+  );
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchBookings();
+  };
 
   return (
     <ImageBackground
@@ -35,42 +56,40 @@ const RecentBookings = () => {
         resizeMode="cover"
     >
         <SafeAreaView className="flex-1 bg-transparent">
-             {/* Header */}
              <View className="px-5 py-6">
                 <Text className="text-2xl font-PoppinsBold text-white">
                     Recent Bookings
                 </Text>
             </View>
 
-            {/* List Booking */}
-            <FlatList
-                data={bookings}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => <BookingCard item={item} />}
-                contentContainerStyle={{ paddingBottom: 100, flexGrow: 1 }}
-                showsVerticalScrollIndicator={false}
-                
-                // Komponen ketika data kosong
-                ListEmptyComponent={() => (
-                    <View className="flex flex-col items-center justify-center h-[60vh]">
-                        {!loading ? (
-                            <>
-                                <Image 
-                                    source={images.noResult} 
-                                    className="w-40 h-40" 
-                                    alt="No bookings found" 
-                                    resizeMode="contain" 
-                                />
-                                <Text className="text-sm font-PoppinsMedium text-gray-500 mt-4">
-                                    Tidak ada booking bus ditemukan
-                                </Text>
-                            </>
-                        ) : (
-                            <ActivityIndicator size="small" color="#0286FF" />
-                        )}
-                    </View>
-                )}
-            />
+            {loading && !refreshing ? (
+                <View className="flex-1 justify-center items-center">
+                    <ActivityIndicator size="large" color="#0286FF" />
+                </View>
+            ) : (
+                <FlatList
+                    data={bookings}
+                    keyExtractor={(item: any) => item.id}
+                    renderItem={({ item }) => <BookingCard item={item} />}
+                    contentContainerStyle={{ paddingBottom: 100, flexGrow: 1 }}
+                    showsVerticalScrollIndicator={false}
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                    }
+                    ListEmptyComponent={() => (
+                        <View className="flex flex-col items-center justify-center h-[50vh]">
+                            <Image 
+                                source={images.noResult} 
+                                className="w-40 h-40" 
+                                resizeMode="contain" 
+                            />
+                            <Text className="text-sm font-PoppinsMedium text-white mt-4">
+                                Tidak ada booking bus ditemukan
+                            </Text>
+                        </View>
+                    )}
+                />
+            )}
         </SafeAreaView>
     </ImageBackground>
   );

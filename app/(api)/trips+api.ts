@@ -1,6 +1,5 @@
 import { neon } from '@neondatabase/serverless';
 
-// Definisi Jadwal Statis (Master Data)
 const SCHEDULES: Record<string, { [key: string]: string[] }> = {
     "Anggrek-Alam Sutera": {
         "Mon-Thu": ["06:05 AM", "07:30 AM", "10:10 AM", "12:10 PM", "14:10 PM", "15:30 PM", "17:30 PM"],
@@ -24,7 +23,6 @@ const SCHEDULES: Record<string, { [key: string]: string[] }> = {
     },
 };
 
-// Mapping nama panjang ke nama pendek untuk key jadwal
 const LOCATION_MAP: Record<string, string> = {
     "BINUS @ Alam Sutera Campus": "Alam Sutera",
     "BINUS Anggrek Campus": "Anggrek",
@@ -43,14 +41,12 @@ export async function GET(request: Request) {
     return Response.json({ error: 'Missing parameters' }, { status: 400 });
   }
 
-  // Konversi nama lokasi panjang ke pendek untuk mencocokkan key SCHEDULES
   const origin = LOCATION_MAP[originFull] || originFull;
   const destination = LOCATION_MAP[destinationFull] || destinationFull;
   const routeKey = `${origin}-${destination}`;
 
-  // Ambil Jadwal Dasar (Static)
   const date = new Date(dateStr);
-  const dayOfWeek = date.getDay(); // 0=Sun, 1=Mon...
+  const dayOfWeek = date.getDay();
   
   const scheduleData = SCHEDULES[routeKey];
   let timeSlots: string[] = [];
@@ -62,11 +58,10 @@ export async function GET(request: Request) {
   }
 
   if (timeSlots.length === 0) {
-      return Response.json({ data: [] }); // Tidak ada jadwal / Libur
+      return Response.json({ data: [] });
   }
 
   try {
-    // Hitung kursi terbooking dari database
     const bookings = await sql`
       SELECT departure_time, COUNT(*) as count 
       FROM bookings 
@@ -78,7 +73,6 @@ export async function GET(request: Request) {
 
     const MAX_SEATS = 30;
 
-    // Gabungkan jadwal + data booking
     const result = timeSlots.map(time => {
       const bookedCount = bookings.find((b: any) => b.departure_time === time)?.count || 0;
       const available = MAX_SEATS - Number(bookedCount);
@@ -101,13 +95,16 @@ export async function POST(request: Request) {
   const sql = neon(`${process.env.DATABASE_URL}`);
   
   try {
-    const { user_id, user_name, user_email, origin, destination, date, time } = await request.json();
+    const { 
+        user_id, user_name, user_email, 
+        origin, destination, date, time, 
+        booking_code 
+    } = await request.json();
 
-    if (!user_id || !origin || !destination || !date || !time) {
+    if (!user_id || !origin || !destination || !date || !time || !booking_code) {
         return Response.json({ error: "Data tidak lengkap" }, { status: 400 });
     }
 
-    // Cek lagi apakah penuh sebelum insert (Double check)
     const existing = await sql`
         SELECT COUNT(*) as count FROM bookings 
         WHERE origin=${origin} AND destination=${destination} 
@@ -118,16 +115,24 @@ export async function POST(request: Request) {
         return Response.json({ error: "Maaf, bus sudah penuh!" }, { status: 400 });
     }
 
-    // Lakukan Booking
     await sql`
-        INSERT INTO bookings (user_id, user_name, user_email, origin, destination, departure_date, departure_time)
-        VALUES (${user_id}, ${user_name}, ${user_email}, ${origin}, ${destination}, ${date}, ${time})
+        INSERT INTO bookings (
+            booking_code, user_id, user_name, user_email, 
+            origin, destination, departure_date, departure_time, seats_booked
+        )
+        VALUES (
+            ${booking_code}, ${user_id}, ${user_name}, ${user_email}, 
+            ${origin}, ${destination}, ${date}, ${time}, 1
+        )
     `;
 
-    return Response.json({ success: true });
+    return Response.json({ success: true, booking_code: booking_code });
 
   } catch (error) {
     console.error("Booking Error:", error);
+    if (error.code === '23505') { 
+        return Response.json({ error: "Booking code duplicate, try again." }, { status: 409 });
+    }
     return Response.json({ error: "Gagal memproses booking" }, { status: 500 });
   }
 }
