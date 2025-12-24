@@ -9,7 +9,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 interface BookLayoutProps {
     title: string;
     children: React.ReactNode;
-    showDirections?: boolean; // Tambahkan prop opsional ini
+    showDirections?: boolean;
 }
 
 const BookLayout = ({ title, children, showDirections = false }: BookLayoutProps) => {
@@ -31,7 +31,6 @@ const BookLayout = ({ title, children, showDirections = false }: BookLayoutProps
                         </Text>
                     </View>
                     
-                    {/* Teruskan prop showDirections ke Map */}
                     <Map showDirections={showDirections} />
                 </View>
                 
