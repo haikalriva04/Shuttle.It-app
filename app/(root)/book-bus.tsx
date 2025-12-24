@@ -2,6 +2,7 @@ import BookLayout from "@/components/BookLayout";
 import CustomButton from "@/components/CustomButton";
 import GoogleTextInput from "@/components/GoogleTextInput";
 import { icons } from "@/constants";
+import { fetchAPI } from "@/lib/fetch"; // Import fetchAPI
 import { useLocationStore } from "@/store";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { router } from "expo-router";
@@ -51,10 +52,10 @@ const BookBus = () => {
             setSelectedTime(null); 
             try {
                 const dateStr = date.toLocaleDateString('en-CA'); 
-                const response = await fetch(
-                    `/(api)/trips?origin=${encodeURIComponent(userAddress)}&destination=${encodeURIComponent(destinationAddress)}&date=${dateStr}`
+                // UPDATE: Gunakan fetchAPI
+                const json = await fetchAPI(
+                    `/trips?origin=${encodeURIComponent(userAddress)}&destination=${encodeURIComponent(destinationAddress)}&date=${dateStr}`
                 );
-                const json = await response.json();
                 if (json.data) setSchedules(json.data);
             } catch (error) {
                 console.error("Error fetching schedules:", error);

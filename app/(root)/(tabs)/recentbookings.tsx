@@ -16,7 +16,8 @@ const RecentBookings = () => {
     if(!refreshing) setLoading(true); 
     
     try {
-        const response = await fetch(`/(api)/booking?user_id=${user.id}`);
+        // FIXED: URL menjadi "/booking"
+        const response = await fetch(`/booking?user_id=${user.id}`);
         const result = await response.json();
 
         if (response.ok) {
@@ -88,7 +89,7 @@ const RecentBookings = () => {
                                 className="w-40 h-40" 
                                 resizeMode="contain" 
                             />
-                            <Text className="text-md font-PoppinsMedium text-white mt-4">
+                            <Text className="text-sm font-PoppinsMedium text-white mt-4">
                                 Tidak ada booking bus ditemukan
                             </Text>
                         </View>

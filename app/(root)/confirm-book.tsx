@@ -32,12 +32,12 @@ const ConfirmBook = () => {
          if (!user) return;
          setIsBooking(true);
 
-         // Generate ID Tiket
+         // Generate ID Tiket (QR Code Value)
          const uniqueCode = `BOOK-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 
          try {
-             // POST ke /api/booking
-             const response = await fetch("/(api)/booking", {
+             // FIXED: URL menjadi "/booking" (tanpa /(api))
+             const response = await fetch("/booking", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

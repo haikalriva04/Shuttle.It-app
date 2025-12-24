@@ -34,14 +34,14 @@ const BookingCard = ({ item, onBookingCancelled }: BookingCardProps) => {
                 onPress: async () => {
                     setIsCancelling(true);
                     try {
-                        // Panggil API DELETE
-                        const response = await fetch(`/(api)/booking?booking_code=${item.id}`, {
+                        // FIXED: URL menjadi "/booking"
+                        const response = await fetch(`/booking?booking_code=${item.id}`, {
                             method: "DELETE",
                         });
 
                         if (response.ok) {
                             setShowModal(false);
-                            onBookingCancelled(); // Refresh List
+                            onBookingCancelled(); 
                             Alert.alert("Berhasil", "Booking berhasil dibatalkan.");
                         } else {
                             const result = await response.json();
@@ -110,7 +110,7 @@ const BookingCard = ({ item, onBookingCancelled }: BookingCardProps) => {
             date: item.date,
             time: item.time,
         }}
-        allowCancellation={true} // Aktifkan tombol cancel di sini
+        allowCancellation={true}
         onCancelBooking={handleCancelBooking}
         isCancelling={isCancelling}
       />
