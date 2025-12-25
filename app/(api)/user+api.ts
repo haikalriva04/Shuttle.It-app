@@ -12,8 +12,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // SOLUSI: Gunakan ON CONFLICT DO NOTHING (atau UPDATE)
-    // Ini akan mencegah error jika user sudah ada di database.
     const response = await sql`
       INSERT INTO users (
         name, 
@@ -30,8 +28,7 @@ export async function POST(request: Request) {
       RETURNING id, name, email, clerk_id;
     `;
 
-    // Note: Kita menggunakan DO UPDATE agar jika user mendaftar ulang 
-    // setelah dihapus di Clerk, Clerk ID yang baru akan ter-update di database lokal.
+
 
     return Response.json({ data: response[0] }, { status: 201 });
   } catch (error) {

@@ -1,16 +1,18 @@
 import { icons } from "@/constants";
+import { fetchAPI } from "@/lib/fetch";
 import React, { useState } from "react";
 import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import TicketModal from "./TicketModal";
 
 interface BookingData {
-  id: string; // Booking Code
+  id: string; 
   origin: string;
   destination: string;
   date: string;
   time: string;
   bookingDate: string;
+  status: string;
 }
 
 interface BookingCardProps {
@@ -22,10 +24,14 @@ const BookingCard = ({ item, onBookingCancelled }: BookingCardProps) => {
   const [showModal, setShowModal] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
 
+  const isVerified = item.status === 'verified';
+
   const handleCancelBooking = async () => {
+    if (isVerified) return;
+
     Alert.alert(
         "Batalkan Booking",
-        "Apakah Anda yakin ingin membatalkan booking ini? Kursi Anda akan diberikan ke orang lain.",
+        "Apakah Anda yakin ingin membatalkan booking ini?",
         [
             { text: "Tidak", style: "cancel" },
             { 
@@ -34,21 +40,14 @@ const BookingCard = ({ item, onBookingCancelled }: BookingCardProps) => {
                 onPress: async () => {
                     setIsCancelling(true);
                     try {
-                        // FIXED: URL menjadi "/booking"
-                        const response = await fetch(`/booking?booking_code=${item.id}`, {
+                        await fetchAPI(`/booking?booking_code=${item.id}`, {
                             method: "DELETE",
                         });
-
-                        if (response.ok) {
-                            setShowModal(false);
-                            onBookingCancelled(); 
-                            Alert.alert("Berhasil", "Booking berhasil dibatalkan.");
-                        } else {
-                            const result = await response.json();
-                            Alert.alert("Gagal", result.error || "Gagal membatalkan booking.");
-                        }
-                    } catch (error) {
-                        Alert.alert("Error", "Gagal terhubung ke server.");
+                        setShowModal(false);
+                        onBookingCancelled(); 
+                        Alert.alert("Berhasil", "Booking berhasil dibatalkan.");
+                    } catch (error: any) {
+                        Alert.alert("Gagal", error.message || "Gagal membatalkan booking.");
                     } finally {
                         setIsCancelling(false);
                     }
@@ -72,6 +71,7 @@ const BookingCard = ({ item, onBookingCancelled }: BookingCardProps) => {
         </View>
 
         <View className="flex-1 p-3 justify-center bg-white">
+            {/* Header Card: Rute & Status */}
             <View className="flex-row items-center mb-2">
                 <Text className="text-xs font-PoppinsBold text-neutral-800 flex-1" numberOfLines={1}>
                     {item.origin}
@@ -92,7 +92,14 @@ const BookingCard = ({ item, onBookingCancelled }: BookingCardProps) => {
                     </Text>
                 </View>
                 <View className="items-end">
-                     <Text className="text-[9px] text-gray-300 font-PoppinsRegular">Dipesan</Text>
+                     {/* Tampilkan Badge Status jika Verified */}
+                     {isVerified ? (
+                        <View className="bg-green-100 px-2 py-0.5 rounded-md mb-1">
+                            <Text className="text-[9px] font-PoppinsBold text-green-700">Terverifikasi</Text>
+                        </View>
+                     ) : (
+                        <Text className="text-[9px] text-gray-300 font-PoppinsRegular">Dipesan</Text>
+                     )}
                      <Text className="text-[9px] text-gray-400 font-PoppinsRegular">{item.bookingDate}</Text>
                 </View>
             </View>
@@ -109,6 +116,7 @@ const BookingCard = ({ item, onBookingCancelled }: BookingCardProps) => {
             destination: item.destination,
             date: item.date,
             time: item.time,
+            status: item.status // Pass status ke modal
         }}
         allowCancellation={true}
         onCancelBooking={handleCancelBooking}

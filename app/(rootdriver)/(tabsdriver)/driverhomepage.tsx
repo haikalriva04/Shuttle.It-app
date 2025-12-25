@@ -22,23 +22,34 @@ export default function DriverHomePage() {
     setScanned(true);
     
     try {
-        const response = await fetchAPI(`/booking?booking_code=${data}`);
+        const response = await fetchAPI('/booking', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ booking_code: data })
+        });
         
-        if (response.data && response.data.length > 0) {
-            const ticket = response.data[0];
+        if (response.success || response.alreadyVerified) {
+            const ticket = response.data || {}; 
+
+            
+            const title = response.alreadyVerified ? "Sudah Terverifikasi ⚠️" : "Verifikasi Berhasil ✅";
+            const message = response.alreadyVerified 
+                ? "Tiket ini sudah digunakan sebelumnya." 
+                : `Tiket Valid!\nPenumpang: ${ticket.username || 'User'}\nRute: ${ticket.origin} -> ${ticket.destination}`;
+
             Alert.alert(
-                "Tiket Valid ✅",
-                `Penumpang: ${ticket.username || 'User'}\nRute: ${ticket.origin} -> ${ticket.destination}\nJadwal: ${ticket.departure_time}`,
+                title,
+                message,
                 [{ text: "OK", onPress: () => setScanned(false) }]
             );
         } else {
-            throw new Error("Data tidak ditemukan");
+            throw new Error(response.error || "Gagal verifikasi");
         }
 
-    } catch (error) {
+    } catch (error: any) {
         Alert.alert(
-            "Tiket Tidak Valid ❌",
-            "Data booking tidak ditemukan di sistem.",
+            "Gagal Verifikasi ❌",
+            error.message || "QR Code tidak valid atau tidak ditemukan.",
             [{ text: "Scan Lagi", onPress: () => setScanned(false) }]
         );
     }
@@ -58,16 +69,12 @@ export default function DriverHomePage() {
         resizeMode="cover"
     >
         <SafeAreaView className="flex-1 bg-transparent">
-            {/* 1. Header */}
-            <View className="px-5 py-1 flex-row justify-between items-center mt-2">
-                {/* Logo Shuttle It (Kiri) */}
-                <Image 
+            <View className="px-5 py-4 flex-row justify-between items-center mt-2">
+              <Image 
                     source={images.shuttleItLogo} 
                     className="w-36 h-36" 
                     resizeMode="contain" 
                 />
-                
-                {/* Tombol Logout (Kanan) */}
                 <TouchableOpacity 
                     onPress={() => router.replace("/(auth)/pilih-masuk")}
                     className="bg-black/20 rounded-full"
@@ -80,7 +87,6 @@ export default function DriverHomePage() {
                 </TouchableOpacity>
             </View>
 
-            {/* 2. Text Sambutan */}
             <View className="px-6 mt-1 mb-8">
                 <Text className="text-white font-PoppinsBold text-2xl">
                     Halo Driver !
@@ -90,12 +96,11 @@ export default function DriverHomePage() {
                 </Text>
             </View>
 
-            {/* 3 & 4. QR Scanner Area */}
             <View className="flex-1 items-center justify-start mt-5">
                 <View 
                     style={{ 
                         width: 300, 
-                        height: 400, 
+                        height: 300, 
                         overflow: 'hidden', 
                         borderRadius: 20,
                         borderWidth: 4,
@@ -112,9 +117,8 @@ export default function DriverHomePage() {
                     />
                 </View>
 
-                {/* Indikator Status */}
                 <Text className="text-white font-PoppinsMedium mt-6 bg-black/40 px-4 py-2 rounded-lg overflow-hidden">
-                    {scanned ? "Memproses Data..." : "Arahkan kamera ke QR Code"}
+                    {scanned ? "Memproses Data..." : "Kamera Aktif"}
                 </Text>
 
                 {scanned && (

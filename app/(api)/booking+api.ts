@@ -1,6 +1,5 @@
 import { neon } from "@neondatabase/serverless";
 
-// 1. POST: Membuat Booking Baru & Validasi Kursi
 export async function POST(request: Request) {
   try {
     const sql = neon(`${process.env.DATABASE_URL}`);
@@ -14,7 +13,6 @@ export async function POST(request: Request) {
         return Response.json({ error: "Data tidak lengkap" }, { status: 400 });
     }
 
-    // Cek apakah kursi sudah penuh (Mencegah overbooking)
     const existing = await sql`
         SELECT COUNT(*) as count FROM bookings 
         WHERE origin=${origin} AND destination=${destination} 
@@ -25,15 +23,14 @@ export async function POST(request: Request) {
         return Response.json({ error: "Maaf, bus sudah penuh!" }, { status: 400 });
     }
 
-    // Insert Booking Baru
     await sql`
         INSERT INTO bookings (
             booking_code, user_id, user_name, user_email, 
-            origin, destination, departure_date, departure_time, seats_booked
+            origin, destination, departure_date, departure_time, seats_booked, status
         )
         VALUES (
             ${booking_code}, ${user_id}, ${user_name}, ${user_email}, 
-            ${origin}, ${destination}, ${date}, ${time}, 1
+            ${origin}, ${destination}, ${date}, ${time}, 1, 'booked'
         )
     `;
 
@@ -48,31 +45,77 @@ export async function POST(request: Request) {
   }
 }
 
-// 2. GET: Mengambil History Booking User
 export async function GET(request: Request) {
     try {
         const sql = neon(`${process.env.DATABASE_URL}`);
         const { searchParams } = new URL(request.url);
+        
         const userId = searchParams.get("user_id");
+        const bookingCode = searchParams.get("booking_code");
 
-        if(!userId) {
-            return Response.json({ error: "User ID Missing" }, { status: 400 });
+        if (bookingCode) {
+            const ticket = await sql`
+                SELECT * FROM bookings 
+                WHERE booking_code = ${bookingCode}
+            `;
+            return Response.json({ data: ticket });
         }
 
-        const bookings = await sql`
-            SELECT * FROM bookings 
-            WHERE user_id = ${userId} 
-            ORDER BY created_at DESC
-        `;
+        if (userId) {
+            const bookings = await sql`
+                SELECT * FROM bookings 
+                WHERE user_id = ${userId} 
+                ORDER BY created_at DESC
+            `;
+            return Response.json({ data: bookings });
+        }
 
-        return Response.json({ data: bookings });
+        return Response.json({ error: "Missing Parameters" }, { status: 400 });
+
     } catch (error) {
         console.error("Booking GET Error:", error);
         return Response.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
 
-// 3. DELETE: Membatalkan Booking
+export async function PATCH(request: Request) {
+    try {
+        const sql = neon(`${process.env.DATABASE_URL}`);
+        const { booking_code } = await request.json();
+
+        if (!booking_code) {
+            return Response.json({ error: "Booking code diperlukan" }, { status: 400 });
+        }
+
+        const existingTicket = await sql`SELECT * FROM bookings WHERE booking_code = ${booking_code}`;
+
+        if (existingTicket.length === 0) {
+            return Response.json({ error: "Tiket tidak ditemukan" }, { status: 404 });
+        }
+
+        if (existingTicket[0].status === 'verified') {
+            return Response.json({ message: "Tiket sudah diverifikasi sebelumnya", alreadyVerified: true });
+        }
+
+        const updatedTicket = await sql`
+            UPDATE bookings 
+            SET status = 'verified' 
+            WHERE booking_code = ${booking_code}
+            RETURNING *
+        `;
+
+        return Response.json({ 
+            success: true, 
+            message: "Verifikasi Berhasil", 
+            data: updatedTicket[0] 
+        });
+
+    } catch (error) {
+        console.error("Booking PATCH Error:", error);
+        return Response.json({ error: "Gagal memverifikasi tiket" }, { status: 500 });
+    }
+}
+
 export async function DELETE(request: Request) {
   try {
     const sql = neon(`${process.env.DATABASE_URL}`);
@@ -81,6 +124,12 @@ export async function DELETE(request: Request) {
 
     if (!booking_code) {
       return Response.json({ error: "Booking Code Missing" }, { status: 400 });
+    }
+
+    const check = await sql`SELECT status FROM bookings WHERE booking_code = ${booking_code}`;
+    
+    if (check.length > 0 && check[0].status === 'verified') {
+        return Response.json({ error: "Tiket sudah diverifikasi, tidak dapat dibatalkan." }, { status: 400 });
     }
 
     const deletedBooking = await sql`

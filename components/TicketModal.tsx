@@ -10,11 +10,12 @@ interface TicketModalProps {
   onClose: () => void;
   type: "booking" | "history";
   data: {
-    id: string; // QR Code Value
+    id: string; 
     origin: string;
     destination: string;
     date: string;
     time: string;
+    status?: string;
   };
   allowCancellation?: boolean;
   onCancelBooking?: () => void;
@@ -30,6 +31,9 @@ const TicketModal = ({
     onCancelBooking,
     isCancelling = false
 }: TicketModalProps) => {
+  
+  const isVerified = data.status === 'verified';
+
   return (
     <Modal
       isVisible={isVisible}
@@ -42,7 +46,6 @@ const TicketModal = ({
       <View className="flex-1 justify-center items-center">
         <View className="bg-white w-[85%] rounded-3xl p-6 items-center shadow-lg relative overflow-hidden">
           
-          {/* Close Button (Hanya History) */}
           {type === "history" && !isCancelling && (
             <TouchableOpacity 
               onPress={onClose} 
@@ -56,9 +59,16 @@ const TicketModal = ({
             <Text className="font-PoppinsExtraBold text-xl text-black text-center">
               {type === "booking" ? "Booking Berhasil !" : "E-Tiket Bus"}
             </Text>
-            <Text className="font-PoppinsMedium text-md text-gray-500 text-center mt-1">
-              Silahkan tunjukan tiket ke supir bus
-            </Text>
+            
+            {isVerified ? (
+                <View className="bg-green-100 px-3 py-1 rounded-full mt-2">
+                    <Text className="font-PoppinsBold text-green-600 text-xs">TIKET TERVERIFIKASI</Text>
+                </View>
+            ) : (
+                <Text className="font-PoppinsMedium text-md text-gray-500 text-center mt-1">
+                  Silahkan tunjukan tiket ke supir bus
+                </Text>
+            )}
           </View>
 
           <View className="mb-6 border-2 border-dashed border-gray-200 p-4 rounded-xl">
@@ -95,7 +105,6 @@ const TicketModal = ({
             </View>
           </View>
 
-          {/* Tombol Aksi */}
           {type === "booking" ? (
             <TouchableOpacity
               onPress={() => { onClose(); router.replace("/(root)/(tabs)/home"); }}
@@ -107,13 +116,17 @@ const TicketModal = ({
              allowCancellation && (
                 <TouchableOpacity
                     onPress={onCancelBooking}
-                    disabled={isCancelling}
-                    className={`mt-6 w-full py-3.5 rounded-full items-center justify-center shadow-md ${isCancelling ? 'bg-gray-300' : 'bg-red-500 shadow-red-200'}`}
+                    // Disable jika sedang loading ATAU sudah verified
+                    disabled={isCancelling || isVerified}
+                    className={`mt-6 w-full py-3.5 rounded-full items-center justify-center shadow-md 
+                        ${(isCancelling || isVerified) ? 'bg-neutral-300' : 'bg-red-500 shadow-red-200'}`}
                 >
                     {isCancelling ? (
                         <ActivityIndicator color="white" />
                     ) : (
-                        <Text className="text-white font-PoppinsBold text-base">Batalkan Booking</Text>
+                        <Text className={`font-PoppinsBold text-base ${isVerified ? 'text-neutral-500' : 'text-white'}`}>
+                            {isVerified ? "Tiket Terverifikasi" : "Batalkan Booking"}
+                        </Text>
                     )}
                 </TouchableOpacity>
              )

@@ -1,5 +1,6 @@
 import BookingCard from "@/components/BookingCard";
 import { images } from "@/constants";
+import { fetchAPI } from "@/lib/fetch";
 import { useUser } from "@clerk/clerk-expo";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
@@ -16,11 +17,9 @@ const RecentBookings = () => {
     if(!refreshing) setLoading(true); 
     
     try {
-        // FIXED: URL menjadi "/booking"
-        const response = await fetch(`/booking?user_id=${user.id}`);
-        const result = await response.json();
+        const result = await fetchAPI(`/booking?user_id=${user.id}`);
 
-        if (response.ok) {
+        if (result.data) {
             const mappedData = result.data.map((item: any) => ({
                 id: item.booking_code,
                 origin: item.origin,
@@ -28,6 +27,7 @@ const RecentBookings = () => {
                 date: item.departure_date,
                 time: item.departure_time,
                 bookingDate: new Date(item.created_at).toLocaleDateString('id-ID'),
+                status: item.status || 'booked', // Mapping status dari DB
             }));
             setBookings(mappedData);
         }
