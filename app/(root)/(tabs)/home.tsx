@@ -52,12 +52,12 @@ const campusSchedules = [
     {
         title: "Binus @ Bandung Paskal",
         image: images.binusPaskal,
-        route: "/(root)/jadwal-paskal" // Assuming this page exists or will be made
+        route: "/(root)/jadwal-paskal"
     },
     {
         title: "Binus @ Bandung Dago",
         image: images.binusDago,
-        route: "/(root)/jadwal-dago" // Assuming this page exists or will be made
+        route: "/(root)/jadwal-dago"
     },
 ];
 
