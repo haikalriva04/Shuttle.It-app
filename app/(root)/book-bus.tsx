@@ -2,7 +2,7 @@ import BookLayout from "@/components/BookLayout";
 import CustomButton from "@/components/CustomButton";
 import GoogleTextInput from "@/components/GoogleTextInput";
 import { icons } from "@/constants";
-import { fetchAPI } from "@/lib/fetch"; // Import fetchAPI
+import { fetchAPI } from "@/lib/fetch";
 import { useLocationStore } from "@/store";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { router } from "expo-router";
@@ -25,6 +25,7 @@ interface ScheduleItem {
     time: string;
     seats_available: number;
     is_full: boolean;
+    is_past?: boolean; // Properti tambahan untuk status waktu
 }
 
 const BookBus = () => {
@@ -47,24 +48,58 @@ const BookBus = () => {
     useEffect(() => {
         const fetchSchedules = async () => {
             if (!userAddress || !destinationAddress) return;
+            
             setIsLoading(true);
             setSchedules([]); 
             setSelectedTime(null); 
+
             try {
                 const dateStr = date.toLocaleDateString('en-CA'); 
-                // UPDATE: Gunakan fetchAPI
                 const json = await fetchAPI(
                     `/trips?origin=${encodeURIComponent(userAddress)}&destination=${encodeURIComponent(destinationAddress)}&date=${dateStr}`
                 );
-                if (json.data) setSchedules(json.data);
+
+                if (json.data) {
+                    setSchedules(json.data);
+                }
             } catch (error) {
                 console.error("Error fetching schedules:", error);
             } finally {
                 setIsLoading(false);
             }
         };
+
         fetchSchedules();
     }, [userAddress, destinationAddress, date]);
+
+    // UPDATE LOGIC: Menandai waktu yang sudah lewat (is_past) tanpa menghapusnya
+    const processedSchedules = useMemo(() => {
+        const now = new Date();
+        const isToday = date.toDateString() === now.toDateString();
+
+        return schedules.map((schedule) => {
+            let isPast = false;
+
+            if (isToday) {
+                const [timeStr, modifier] = schedule.time.split(' ');
+                if (timeStr) {
+                    let [hours, minutes] = timeStr.split(':').map(Number);
+                    if (modifier === 'PM' && hours < 12) hours += 12;
+                    if (modifier === 'AM' && hours === 12) hours = 0;
+
+                    const scheduleDate = new Date(date);
+                    scheduleDate.setHours(hours, minutes, 0, 0);
+
+                    // Tandai true jika waktu jadwal < waktu sekarang
+                    if (scheduleDate < now) {
+                        isPast = true;
+                    }
+                }
+            }
+            
+            return { ...schedule, is_past: isPast };
+        });
+    }, [schedules, date]);
 
     const onDateChange = (event: any, selectedDate?: Date) => {
         if (Platform.OS === 'android') setShowDatePicker(false);
@@ -159,7 +194,18 @@ const BookBus = () => {
                         <Text className="font-PoppinsMedium text-sm text-black">{selectedTime || "Pilih Jam"}</Text>
                     </TouchableOpacity>
                 </View>
-                {showDatePicker && (<DateTimePicker value={date} mode="date" is24Hour={true} display="default" onChange={onDateChange} />)}
+                
+                {showDatePicker && (
+                    <DateTimePicker 
+                        value={date} 
+                        mode="date" 
+                        is24Hour={true} 
+                        display="default" 
+                        onChange={onDateChange}
+                        minimumDate={new Date()} 
+                    />
+                )}
+
                 <Modal visible={showTimeModal} transparent={true} animationType="slide" onRequestClose={() => setShowTimeModal(false)}>
                     <View className="flex-1 justify-end bg-black/50">
                         <View className="bg-white rounded-t-3xl p-5 h-[60%]">
@@ -167,13 +213,64 @@ const BookBus = () => {
                                 <Text className="text-lg font-PoppinsBold">Pilih Jam</Text>
                                 <TouchableOpacity onPress={() => setShowTimeModal(false)}><Image source={icons.close} className="w-6 h-6" /></TouchableOpacity>
                             </View>
+                            
                             {isLoading ? (<ActivityIndicator size="large" color="#0286FF" />) : (
-                                <FlatList data={schedules} keyExtractor={(item) => item.time} renderItem={({ item }) => (
-                                    <TouchableOpacity disabled={item.is_full} onPress={() => { setSelectedTime(item.time); setShowTimeModal(false); }} className={`p-4 mb-3 rounded-xl border flex-row justify-between items-center ${item.is_full ? "bg-gray-100 border-gray-200 opacity-60" : selectedTime === item.time ? "bg-blue-100 border-blue-500" : "bg-neutral-50 border-neutral-200"}`}>
-                                        <View><Text className={`font-PoppinsMedium ${selectedTime === item.time ? "text-blue-600" : "text-black"} ${item.is_full && "text-gray-400"}`}>{item.time}</Text></View>
-                                        <View className="flex-row items-center"><Text className={`text-xs font-bold mr-1 ${item.is_full ? "text-red-500" : "text-green-600"}`}>{item.is_full ? "KURSI PENUH" : `${item.seats_available} Kursi`}</Text></View>
-                                    </TouchableOpacity>
-                                )} ListEmptyComponent={() => (<Text className="text-center text-gray-500 mt-5">Tidak ada jadwal tersedia untuk rute/tanggal ini.</Text>)} />
+                                <FlatList 
+                                    data={processedSchedules} // Gunakan data yang sudah diproses (ada is_past)
+                                    keyExtractor={(item) => item.time} 
+                                    renderItem={({ item }) => {
+                                        // Logic Styling
+                                        const isSelected = selectedTime === item.time;
+                                        const isPast = item.is_past;
+                                        const isFull = item.is_full;
+                                        const isDisabled = isPast || isFull;
+
+                                        let containerStyle = "bg-neutral-50 border-neutral-200"; // Default
+                                        let textStyle = "text-black";
+                                        let infoTextStyle = "text-green-600";
+
+                                        if (isSelected) {
+                                            containerStyle = "bg-blue-100 border-blue-500";
+                                            textStyle = "text-blue-600";
+                                        } else if (isPast) {
+                                            containerStyle = "bg-neutral-200 border-neutral-200"; // Abu-abu gelap (Past)
+                                            textStyle = "text-gray-400";
+                                            infoTextStyle = "text-gray-400";
+                                        } else if (isFull) {
+                                            containerStyle = "bg-gray-100 border-gray-200 opacity-60"; // Abu-abu terang (Full)
+                                            textStyle = "text-gray-400";
+                                            infoTextStyle = "text-red-500";
+                                        }
+
+                                        return (
+                                            <TouchableOpacity 
+                                                disabled={isDisabled}
+                                                onPress={() => { setSelectedTime(item.time); setShowTimeModal(false); }} 
+                                                className={`p-4 mb-3 rounded-xl border flex-row justify-between items-center ${containerStyle}`}
+                                            >
+                                                <View>
+                                                    <Text className={`font-PoppinsMedium ${textStyle}`}>
+                                                        {item.time}
+                                                    </Text>
+                                                </View>
+                                                <View className="flex-row items-center">
+                                                    <Text className={`text-xs font-bold mr-1 ${infoTextStyle}`}>
+                                                        {isPast 
+                                                            ? "WAKTU LEWAT" 
+                                                            : isFull 
+                                                                ? "KURSI PENUH" 
+                                                                : `${item.seats_available} Kursi`}
+                                                    </Text>
+                                                </View>
+                                            </TouchableOpacity>
+                                        );
+                                    }} 
+                                    ListEmptyComponent={() => (
+                                        <Text className="text-center text-gray-500 mt-5">
+                                            Tidak ada jadwal tersedia untuk rute/tanggal ini.
+                                        </Text>
+                                    )} 
+                                />
                             )}
                         </View>
                     </View>
