@@ -48,36 +48,24 @@ export async function POST(request: Request) {
   }
 }
 
-// 2. GET: Mengambil Data Booking (History User ATAU Validasi Driver)
+// 2. GET: Mengambil History Booking User
 export async function GET(request: Request) {
     try {
         const sql = neon(`${process.env.DATABASE_URL}`);
         const { searchParams } = new URL(request.url);
-        
         const userId = searchParams.get("user_id");
-        const bookingCode = searchParams.get("booking_code"); // Parameter baru untuk Scan QR
 
-        // KONDISI A: Jika request membawa 'booking_code' (Dipakai Driver saat Scan)
-        if (bookingCode) {
-            const ticket = await sql`
-                SELECT * FROM bookings 
-                WHERE booking_code = ${bookingCode}
-            `;
-            return Response.json({ data: ticket });
+        if(!userId) {
+            return Response.json({ error: "User ID Missing" }, { status: 400 });
         }
 
-        // KONDISI B: Jika request membawa 'user_id' (Dipakai User untuk lihat History)
-        if (userId) {
-            const bookings = await sql`
-                SELECT * FROM bookings 
-                WHERE user_id = ${userId} 
-                ORDER BY created_at DESC
-            `;
-            return Response.json({ data: bookings });
-        }
+        const bookings = await sql`
+            SELECT * FROM bookings 
+            WHERE user_id = ${userId} 
+            ORDER BY created_at DESC
+        `;
 
-        return Response.json({ error: "Missing Parameters (user_id or booking_code)" }, { status: 400 });
-
+        return Response.json({ data: bookings });
     } catch (error) {
         console.error("Booking GET Error:", error);
         return Response.json({ error: "Internal Server Error" }, { status: 500 });
