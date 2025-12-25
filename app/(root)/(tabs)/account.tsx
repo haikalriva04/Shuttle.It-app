@@ -24,7 +24,7 @@ const Account = () => {
   const handleLogout = async () => {
     try {
       await signOut();
-      router.replace("/(auth)/sign-in");
+      router.replace("/(auth)/pilih-masuk");
     } catch (err) {
       console.error("Error signing out:", err);
     }

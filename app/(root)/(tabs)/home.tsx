@@ -72,7 +72,7 @@ export default function Page() {
     const handleSignOut = async () => {
         try {
             await signOut();
-            router.replace("/(auth)/sign-in");
+            router.replace("/(auth)/pilih-masuk");
         } catch (err) {
             console.error("Error signing out:", err);
         }

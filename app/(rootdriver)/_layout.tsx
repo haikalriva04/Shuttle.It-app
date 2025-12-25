@@ -1,11 +1,11 @@
 import { Stack } from "expo-router";
 
-const Layout = () => {
+const DriverLayout = () => {
   return (
-      <Stack>
-        <Stack.Screen name ="(tabsdriver)" options ={{ headerShown: false }} />
-      </Stack>
+    <Stack screenOptions={{ headerShown: false }}> 
+      <Stack.Screen name="(tabsdriver)" options={{ headerShown: false }} />
+    </Stack>
   );
-}
+};
 
-export default Layout;
+export default DriverLayout;
