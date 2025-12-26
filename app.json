@@ -8,11 +8,6 @@
     "scheme": "shuttleit",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/images/splash-screen.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
       "supportsTablet": true
     },
@@ -21,9 +16,6 @@
         "backgroundColor": "#ffffff",
         "foregroundImage": "./assets/images/adaptive-icon.png"
       },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
-    },
     "web": {
       "bundler": "metro",
       "output": "server",
@@ -36,6 +28,18 @@
           "origin": "https://shuttle-it-app.vercel.app"
         }
       ],
+      [
+        "expo-splash-screen", 
+        {
+          "image": "./assets/images/splash-screen.png", 
+          "imageWidth": 200, 
+          "resizeMode": "contain", 
+          "backgroundColor": "#ffffff", 
+          "dark": {
+            "backgroundColor": "#000000"
+          }
+        }
+      ],
       "expo-secure-store",
       "expo-web-browser",
       "@react-native-community/datetimepicker"
@@ -43,6 +47,15 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {
+        "origin": "https://shuttle-it-app.vercel.app"
+      },
+      "eas": {
+        "projectId": "cf414865-cdd7-4ba6-93b5-af5a9d6c4b39"
+      }
     }
   }
+}
 }
