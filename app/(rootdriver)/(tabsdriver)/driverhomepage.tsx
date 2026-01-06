@@ -3,13 +3,15 @@ import { fetchAPI } from "@/lib/fetch";
 import { Camera, CameraView } from "expo-camera";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert, Image, ImageBackground, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Image, ImageBackground, LogBox, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function DriverHomePage() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
 
   useEffect(() => {
+    LogBox.ignoreLogs(['Fetch error', 'Network request failed', 'Possible Unhandled Promise Rejection']);
+
     const getCameraPermissions = async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === "granted");
@@ -18,7 +20,7 @@ export default function DriverHomePage() {
     getCameraPermissions();
   }, []);
 
-  const handleBarCodeScanned = async ({ type, data }: { type: string; data: string }) => {
+const handleBarCodeScanned = async ({ type, data }: { type: string; data: string }) => {
     setScanned(true);
     
     try {
@@ -31,7 +33,6 @@ export default function DriverHomePage() {
         if (response.success || response.alreadyVerified) {
             const ticket = response.data || {}; 
 
-            
             const title = response.alreadyVerified ? "Sudah Terverifikasi ⚠️" : "Verifikasi Berhasil ✅";
             const message = response.alreadyVerified 
                 ? "Tiket ini sudah digunakan sebelumnya." 
@@ -47,9 +48,18 @@ export default function DriverHomePage() {
         }
 
     } catch (error: any) {
+        let errorMessage = error.message || "QR Code tidak valid atau tidak ditemukan.";
+
+        if (errorMessage.includes("404") || errorMessage.includes("HTTP error! status: 404")) {
+            errorMessage = "Maaf QR-Code tidak sesuai";
+        }
+        else if (errorMessage.includes("Fetch error") || errorMessage.includes("Network request failed")) {
+            errorMessage = "Gagal terhubung ke server. Cek koneksi internet.";
+        }
+
         Alert.alert(
             "Gagal Verifikasi ❌",
-            error.message || "QR Code tidak valid atau tidak ditemukan.",
+            errorMessage, 
             [{ text: "Scan Lagi", onPress: () => setScanned(false) }]
         );
     }
@@ -80,7 +90,7 @@ export default function DriverHomePage() {
                     className="bg-black/20 rounded-full"
                 >
                     <Image 
-                        source={icons.out} // Pastikan icons.out ada di constants
+                        source={icons.out}
                         className="w-13 h-13" 
                         resizeMode="contain"
                     />
