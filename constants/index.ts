@@ -21,6 +21,7 @@ import greyLock from "@/assets/icons/grey-lock.png";
 import greyEye from "@/assets/icons/grey_eye.png";
 import history from "@/assets/icons/history.png";
 import homeIcon from "@/assets/icons/home.png";
+import pinKampusAsal from "@/assets/icons/kampus-asal.png";
 import pinKampusTujuan from "@/assets/icons/kampus-tujuan.png";
 import language from "@/assets/icons/language.png";
 import location from "@/assets/icons/location.png";
@@ -89,6 +90,7 @@ export const images = {
 };
 
 export const icons = {
+pinKampusAsal,
 pinKampusTujuan,
 clock,
 addFeedback,
