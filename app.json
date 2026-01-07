@@ -17,6 +17,12 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.haikal.shuttleit",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDC5IwE4c8BkGpiKN7DksKlvLSQD3VLzCY"
+        }
+      },
       "adaptiveIcon": {
         "backgroundColor": "#ffffff",
         "foregroundImage": "./assets/images/adaptive-icon.png"
@@ -33,7 +39,7 @@
       [
         "expo-router",
         {
-          "origin": "https://uber.com/"
+          "origin": "https://shuttle-it.vercel.app"
         }
       ],
       "expo-secure-store",
@@ -43,6 +49,14 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {
+        "origin": "https://shuttle-it.vercel.app"
+      },
+      "eas": {
+        "projectId": "cf414865-cdd7-4ba6-93b5-af5a9d6c4b39"
+      }
     }
   }
 }
