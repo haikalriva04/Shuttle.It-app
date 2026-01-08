@@ -14,7 +14,6 @@ const SignUp = () => {
   const { isLoaded, signUp, setActive } = useSignUp();
   const [ showSuccessModal, setShowSuccessModal] = useState(false);
 
-
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -40,7 +39,6 @@ const SignUp = () => {
       
       setVerification({
         ...verification,
-
         state: "pending",
       });
     } catch (err: any) {
@@ -57,15 +55,15 @@ const SignUp = () => {
       });
 
       if (completeSignUp.status === "complete") {
-        await fetchAPI('/(api)/user', { 
+        // PERBAIKAN DI SINI: Path menjadi '/user', bukan '/(api)/user'
+        await fetchAPI('/user', { 
           method: "POST", 
           body: JSON.stringify({
             name: form.name, 
             email: form.email,
             clerkId: completeSignUp.createdUserId,
           }),
-        } 
-);
+        });
 
         await setActive({ session: completeSignUp.createdSessionId });
         setVerification({ ...verification, state: "success" });
@@ -130,8 +128,8 @@ const SignUp = () => {
             if (verification.state === 'success') setShowSuccessModal(true);
           }}
           >
-            <View className="bg-white px-7 py-9 rounded-2xl min-h[300px]">
-          <Text className="text-2xl font-PoppinsBold" mb-2>Verifikasi</Text>
+            <View className="bg-white px-7 py-9 rounded-2xl min-h-[300px]">
+          <Text className="text-2xl font-PoppinsBold mb-2">Verifikasi</Text>
           <Text className="font-PoppinsRegular mb-5" >Kami mengirim kode verifikasi ke akun {form.email}</Text>
 
           <InputField label="Kode" icon={icons.greyLock} placeholder="Masukan kode verifikasi" value={verification.code} keyboardType="numeric" 
@@ -141,7 +139,7 @@ const SignUp = () => {
             <Text className="text-red-500 text-sm mt-1">{verification.error}</Text>
           )}
 
-          <CustomButton title="Verifikasi akun microsoft" onPress={onPressVerify} className="mt-5 bg-success-500" />
+          <CustomButton title="Verifikasi Email" onPress={onPressVerify} className="mt-5 bg-success-500" />
             </View>
           </ReactNativeModal>
 
