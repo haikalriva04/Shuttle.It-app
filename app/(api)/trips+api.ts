@@ -30,12 +30,17 @@ const LOCATION_MAP: Record<string, string> = {
 };
 
 export async function GET(request: Request) {
+  if (!process.env.DATABASE_URL) {
+      console.error("DATABASE_URL is missing in environment variables");
+      return Response.json({ error: 'Server configuration error' }, { status: 500 });
+  }
+
   const sql = neon(`${process.env.DATABASE_URL}`);
   const { searchParams } = new URL(request.url);
   
   const originFull = searchParams.get('origin');
   const destinationFull = searchParams.get('destination');
-  const dateStr = searchParams.get('date');
+  const dateStr = searchParams.get('date'); // Format: YYYY-MM-DD
 
   if (!originFull || !destinationFull || !dateStr) {
     return Response.json({ error: 'Missing parameters' }, { status: 400 });
@@ -45,9 +50,14 @@ export async function GET(request: Request) {
   const destination = LOCATION_MAP[destinationFull] || destinationFull;
   const routeKey = `${origin}-${destination}`;
 
-  const date = new Date(dateStr);
-  const dayOfWeek = date.getDay();
-  
+
+  const [year, month, day] = dateStr.split('-').map(Number);
+
+  const date = new Date(Date.UTC(year, month - 1, day));
+  const dayOfWeek = date.getUTCDay();
+
+  console.log(`Checking Schedule for: ${dateStr}, Day: ${dayOfWeek}, Route: ${routeKey}`);
+
   const scheduleData = SCHEDULES[routeKey];
   let timeSlots: string[] = [];
 
@@ -62,7 +72,6 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Logic: Hitung berapa orang yang sudah booking di tabel bookings
     const bookings = await sql`
       SELECT departure_time, COUNT(*) as count 
       FROM bookings 
@@ -75,7 +84,7 @@ export async function GET(request: Request) {
     const MAX_SEATS = 30;
 
     const result = timeSlots.map(time => {
-      const bookedCount = bookings.find((b: any) => b.departure_time === time)?.count || 0;
+      const bookedCount = bookings?.find((b: any) => b.departure_time === time)?.count || 0;
       const available = MAX_SEATS - Number(bookedCount);
       
       return {
@@ -88,6 +97,6 @@ export async function GET(request: Request) {
     return Response.json({ data: result });
   } catch (error) {
     console.error("Trips API Error:", error);
-    return Response.json({ error: 'Internal Server Error' }, { status: 500 });
+    return Response.json({ data: [], error: String(error) });
   }
 }

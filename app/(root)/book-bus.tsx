@@ -54,7 +54,15 @@ const BookBus = () => {
             setSelectedTime(null); 
 
             try {
-                const dateStr = date.toLocaleDateString('en-CA'); 
+                // FIX: Manual date formatting (YYYY-MM-DD) agar konsisten di APK/Android
+                // toLocaleDateString('en-CA') sering bermasalah di engine Hermes Android
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const dateStr = `${year}-${month}-${day}`;
+
+                console.log("Fetching schedules for:", dateStr); // Debug log
+
                 const json = await fetchAPI(
                     `/trips?origin=${encodeURIComponent(userAddress)}&destination=${encodeURIComponent(destinationAddress)}&date=${dateStr}`
                 );
@@ -118,10 +126,17 @@ const BookBus = () => {
             Alert.alert("Error", "Mohon pilih jadwal keberangkatan.");
             return;
         }
+
+        // FIX: Pastikan format tanggal ke confirm-book juga aman
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const dateStr = `${year}-${month}-${day}`;
+
         router.push({
             pathname: "/(root)/confirm-book",
             params: { 
-                date: date.toLocaleDateString('en-CA'),
+                date: dateStr,
                 timeSlot: selectedTime, 
                 origin: userAddress,
                 destination: destinationAddress
