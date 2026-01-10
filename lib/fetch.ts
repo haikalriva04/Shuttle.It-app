@@ -1,8 +1,19 @@
 import { useCallback, useEffect, useState } from "react";
 
+// Ambil URL Ngrok dari file .env
+const SERVER_URL = process.env.EXPO_PUBLIC_SERVER_URL;
+
 export const fetchAPI = async (url: string, options?: RequestInit) => {
   try {
-    const response = await fetch(url, options);
+    // Logic: Jika URL tidak diawali 'http', gabungkan dengan SERVER_URL
+    const fullUrl = url.startsWith('http') 
+        ? url 
+        : `${SERVER_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+
+    // Debugging: Cek di terminal apakah URL sudah benar (ada ngrok-nya)
+    console.log("Fetching URL:", fullUrl); 
+
+    const response = await fetch(fullUrl, options);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

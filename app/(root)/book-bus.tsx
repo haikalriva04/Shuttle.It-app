@@ -25,7 +25,7 @@ interface ScheduleItem {
     time: string;
     seats_available: number;
     is_full: boolean;
-    is_past?: boolean; // Properti tambahan untuk status waktu
+    is_past?: boolean;
 }
 
 const BookBus = () => {
